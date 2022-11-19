@@ -1,6 +1,9 @@
 import tkinter as tk
+from tkinter import filedialog as fd
 from random import choice
 import tkinter.ttk as ttk
+import os
+import pathlib
 
 from VarPlus import StringVarPlus
 
@@ -14,7 +17,7 @@ from utils import *
 
 class Main:
 
-    def __init__(self, to_load="parameters/default"):
+    def __init__(self, to_load="parameters/default.SHIMUTstate"):
         """
         This creates the skeleton of the interface
         :param lang: the language of the software
@@ -124,9 +127,10 @@ class Main:
         self.root.config(menu=self.menubar)
         # file
         filemenu = tk.Menu(self.menubar, tearoff=0)
-        filemenu.add_command(label=self.LM.get("load"), command=self.load)
-        filemenu.add_command(label=self.LM.get("save"), command=self.save)
+        filemenu.add_command(label=self.LM.get("load"), command=self.__load)
+        filemenu.add_command(label=self.LM.get("save"), command=self.__save)
         filemenu.add_separator()
+        filemenu.add_command(label=self.LM.get("panic"), command=self.__panic)
         filemenu.add_command(label=self.LM.get("exit"), command=self.quit)
         self.menubar.add_cascade(label=self.LM.get("file"), menu=filemenu)
         # internationalization menu
@@ -152,11 +156,30 @@ class Main:
         self.root.iconbitmap("assets/main_icon.ico")
         self.root.pack_slaves()
 
+    def __load(self):
+        self.__load_parameters(fd.askopenfilename(
+            initialdir=str(pathlib.Path(__file__).parent.resolve())+'/parameters/',
+            title=self.LM.get("load"),
+            filetypes=[('SHIMUT state file', '*.SHIMUTstate')]))
+
+    def __save(self):
+        self.param_reader.save(self, fd.asksaveasfilename(
+            initialdir=str(pathlib.Path(__file__).parent.resolve())+'/parameters/',
+            title=self.LM.get("save"),
+            defaultextension='.SHIMUTstate',
+            filetypes=[('SHIMUT state file', '*.SHIMUTstate')]))
+
     def __reset_root(self):
-        self.param_reader.save(self, "parameters/temp")
+        self.param_reader.save(self, "parameters/temp.SHIMUTstate")
+        self.__load_parameters("parameters/temp.SHIMUTstate")
+
+    def __panic(self):
+        self.__load_parameters("parameters/default.SHIMUTstate")
+
+    def __load_parameters(self, file):
         self.quit()
         self.root.destroy()
-        self.__init__("parameters/temp")
+        self.__init__(file)
         self.mainloop()
 
     def mainloop(self):
@@ -186,12 +209,6 @@ class Main:
         self.root.quit()
         self.player.quit()
         self.LM.quit()
-
-    def load(self, *args):
-        pass
-
-    def save(self, *args):
-        pass
 
 
 """
