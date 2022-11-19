@@ -157,17 +157,21 @@ class Main:
         self.root.pack_slaves()
 
     def __load(self):
-        self.__load_parameters(fd.askopenfilename(
+        file = fd.askopenfilename(
             initialdir=str(pathlib.Path(__file__).parent.resolve())+'/parameters/',
             title=self.LM.get("load"),
-            filetypes=[('SHIMUT state file', '*.SHIMUTstate')]))
+            filetypes=[('SHIMUT state file', '*.SHIMUTstate')])
+        if file != "":
+            self.__load_parameters(file)
 
     def __save(self):
-        self.param_reader.save(self, fd.asksaveasfilename(
+        file = fd.asksaveasfilename(
             initialdir=str(pathlib.Path(__file__).parent.resolve())+'/parameters/',
             title=self.LM.get("save"),
             defaultextension='.SHIMUTstate',
-            filetypes=[('SHIMUT state file', '*.SHIMUTstate')]))
+            filetypes=[('SHIMUT state file', '*.SHIMUTstate')])
+        if file != "":
+            self.param_reader.save(self, file)
 
     def __reset_root(self):
         self.param_reader.save(self, "parameters/temp.SHIMUTstate")
