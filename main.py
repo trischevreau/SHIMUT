@@ -2,16 +2,19 @@ import tkinter as tk
 from random import choice
 import tkinter.ttk as ttk
 
+from VarPlus import StringVarPlus
+
 import managers
 import displayers
 import informers
+from managers import ParamReader
 from vars import *
 from utils import *
 
 
 class Main:
 
-    def __init__(self, lang="EN", conv="english"):
+    def __init__(self, to_load="parameters/default"):
         """
         This creates the skeleton of the interface
         :param lang: the language of the software
@@ -20,17 +23,19 @@ class Main:
 
         self.root = tk.Tk()
 
+        # Classes init 1
+        self.param_reader = ParamReader()
+        self.param_reader.load(to_load)
+        self.LM = managers.LanguageManager(self.param_reader.get("lang_SV"), self.param_reader.get("conv_SV"))
+
         # Variable init
         self.scale = []
-        self.lang_SV = tk.StringVar()
-        self.conv_SV = tk.StringVar()
-        self.lang_SV.set(lang)
-        self.conv_SV.set(conv)
+        self.lang_SV = StringVarPlus(self.LM, "any")
+        self.conv_SV = StringVarPlus(self.LM, "any")
 
-        # Classes init
+        # Classes init 2
         self.player = managers.Player(0, 127, 0.2)
         self.menubar = tk.Menu(self.root)
-        self.LM = managers.LanguageManager(self.lang_SV.get(), self.conv_SV.get())
         self.mainNotebook = ttk.Notebook(self.root)
 
         """
@@ -42,14 +47,14 @@ class Main:
         self.scaleParametersFrame = ttk.LabelFrame(self.parametersFrame, text=self.LM.get("scale_parameters"),
                                                    name="params")
         # Scale Type
-        self.selectedScaleTypeSV = tk.StringVar()
+        self.selectedScaleTypeSV = StringVarPlus(self.LM, "text_db")
         self.scaleChooser = ttk.OptionMenu(self.scaleParametersFrame, self.selectedScaleTypeSV, None,
                                            *[self.LM.get(elem) for elem in scales.keys()], command=self.update_notes)
         self.scaleChooser.pack(side="right")
 
         # Scale height
         self.usableScaleNotes = []
-        self.selectedScaleNoteSV = tk.StringVar()
+        self.selectedScaleNoteSV = StringVarPlus(self.LM, "note")
         self.noteChooser = ttk.OptionMenu(self.scaleParametersFrame, self.selectedScaleNoteSV, None)
         self.noteChooser["menu"].delete(0, "end")
         self.noteChooser.pack(side="left")
@@ -108,11 +113,8 @@ class Main:
         Default Parameters
         """
 
-        self.selectedScaleTypeSV.set(choice([self.scaleChooser['menu'].entrycget(i, "label")
-                                             for i in range(self.scaleChooser['menu'].index("end") + 1)]))
+        self.param_reader.set(self)
         self.update_notes(self.selectedScaleTypeSV.get())
-        self.selectedScaleNoteSV.set(choice([self.noteChooser['menu'].entrycget(i, "label")
-                                             for i in range(self.noteChooser['menu'].index("end") + 1)]))
 
         """
         Menus
@@ -151,9 +153,10 @@ class Main:
         self.root.pack_slaves()
 
     def __reset_root(self):
+        self.param_reader.save(self, "parameters/temp")
         self.quit()
         self.root.destroy()
-        self.__init__(self.lang_SV.get(), self.conv_SV.get())
+        self.__init__("parameters/temp")
         self.mainloop()
 
     def mainloop(self):
@@ -162,7 +165,10 @@ class Main:
 
     def update_notes(self, scaleType):
         self.usableScaleNotes = self.LM.get_notes(scales[self.LM.reverse_get(scaleType)][1])
-        self.noteChooser.set_menu(self.usableScaleNotes[0], *self.usableScaleNotes)
+        if self.selectedScaleNoteSV.get() not in self.usableScaleNotes:
+            self.noteChooser.set_menu(self.usableScaleNotes[0], *self.usableScaleNotes)
+        else:
+            self.noteChooser.set_menu(self.selectedScaleNoteSV.get(), *self.usableScaleNotes)
 
     def apply(self):
         scale = [all_notes_extended[self.LM.reverse_get_note(self.selectedScaleNoteSV.get())]]
@@ -193,6 +199,6 @@ Main loop
 """
 
 if __name__ == "__main__":
-    main = Main("FR", "french")
+    main = Main()
     main.mainloop()
     main.quit()

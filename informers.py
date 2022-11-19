@@ -6,6 +6,8 @@ import tkinter as tk
 import tkinter.ttk as ttk
 import pychord
 
+from VarPlus import StringVarPlus, BooleanVarPlus
+
 from vars import *
 from utils import *
 import displayers
@@ -47,7 +49,7 @@ class Chords:
     This informer uses a score to display chords and their names.
     """
 
-    def __init__(self, root, LM, player, lx, ly, n, deg=(1, 0, 1, 0, 1, 0, 0), func_to_apply=None):
+    def __init__(self, root, LM, player, lx, ly, n, func_to_apply=None):
         """
         This initializes external classes and creates the skeleton
         :param root: the master frame to pack the elements to
@@ -64,9 +66,7 @@ class Chords:
             self.func_to_apply = func_to_apply
         self.score = displayers.Score(self.frame, LM, player, lx, ly, n, funct_to_apply=self.func_to_apply)
         self.deg_frame = ttk.LabelFrame(self.frame, text=LM.get("deg_of_chord"))
-        self.deg_frame_checkboxes_SV = [tk.BooleanVar() for _ in range(n)]
-        for i in range(len(self.deg_frame_checkboxes_SV)):
-            self.deg_frame_checkboxes_SV[i].set(bool(deg[i]))
+        self.deg_frame_checkboxes_SV = [BooleanVarPlus() for _ in range(n)]
         self.deg_frame_checkboxes = [ttk.Checkbutton(self.deg_frame, text=int_to_roman(i+1), command=self.func_to_apply,
                                                      variable=self.deg_frame_checkboxes_SV[i]) for i in range(n)]
         for elem in self.deg_frame_checkboxes:
@@ -125,13 +125,25 @@ class Chords:
         self.score.apply(self.chordsList)
         self.display_chords_annotations()
 
+    def set_state(self, states):
+        translation, octave_number, alteration, *d = states
+        self.score.selectedTranslationSV.set_state(translation)
+        self.score.octaveNumber = int(octave_number)
+        self.score.selectedAlteration.set_state(alteration)
+        for i in range(len(self.deg_frame_checkboxes_SV)):
+            self.deg_frame_checkboxes_SV[i].set(bool(int(d[i])))
+
+    def get_state(self):
+        return self.score.selectedTranslationSV.get_state(), str(self.score.octaveNumber),\
+               self.score.selectedAlteration.get_state(), *[_.get_state() for _ in self.deg_frame_checkboxes_SV],
+
 
 class Progressions(Chords):
 
     def __init__(self, root, LM, player, lx, ly, n):
         super().__init__(root, LM, player, lx, ly, n, func_to_apply=self.__reapply)
         self.pframe = ttk.LabelFrame(root, text=self.LM.get("chord_progression_parameters"))
-        self.selected_progression = tk.StringVar()
+        self.selected_progression = StringVarPlus(self.LM, "text_db")
         progression_chooser = ttk.OptionMenu(self.pframe, self.selected_progression,
                                              self.LM.get("personalized"),
                                              *[self.LM.get(v) for v in progressions.keys()],
@@ -140,7 +152,7 @@ class Progressions(Chords):
         self.selected_chords = []
         self.chords_selectors = []
         for i in range(n):
-            self.selected_chords.append(tk.StringVar())
+            self.selected_chords.append(StringVarPlus(self.LM, "any"))
             self.chords_selectors.append(ttk.OptionMenu(self.pframe, self.selected_chords[-1], int_to_roman(i+1),
                                                         "", command=self.__chord_changed))
             self.chords_selectors[-1].pack(side="left")
@@ -198,3 +210,19 @@ class Progressions(Chords):
         for i in range(len(p)):
             self.selected_chords[i].set(p[i])
         self.__reapply()
+
+    def set_state(self, states):
+        translation, octave_number, alteration, *d = states
+        self.score.selectedTranslationSV.set_state(translation)
+        self.score.octaveNumber = int(octave_number)
+        self.score.selectedAlteration.set_state(alteration)
+        for i in range(len(self.deg_frame_checkboxes_SV)):
+            self.deg_frame_checkboxes_SV[i].set(bool(int(d[i])))
+        for i in range(len(self.selected_chords)):
+            self.selected_chords[i].set(d[len(self.deg_frame_checkboxes_SV)+i])
+        self.selected_progression.set_state(d[-1])
+
+    def get_state(self):
+        return self.score.selectedTranslationSV.get_state(), str(self.score.octaveNumber),\
+               self.score.selectedAlteration.get_state(), *[_.get_state() for _ in self.deg_frame_checkboxes_SV],\
+               *[_.get_state() for _ in self.selected_chords], self.selected_progression.get_state()

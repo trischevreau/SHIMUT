@@ -133,3 +133,48 @@ class Player:
         """ Destroys cleanly the class and midi instruments to avoid causing interferences. """
         midi.quit()
 
+
+class ParamReader:
+
+    def __init__(self):
+        self.file_path = None
+
+    def load(self, file_path):
+        self.file_path = file_path
+        self.dict_ = {}
+        with open(self.file_path, "r") as file:
+            for line in file.readlines():
+                line = line.rstrip().split(";")
+                if len(line[1:]) == 1:
+                    self.dict_[line[0]] = line[1:][0]
+                else:
+                    self.dict_[line[0]] = line[1:]
+        return self.dict_
+
+    def get(self, name):
+        if self.file_path is not None:
+            return self.dict_[name]
+        else:
+            raise ValueError
+
+    def set(self, toSet):
+        for key, val in toSet.__dict__.items():
+            try:
+                val.set_state(self.dict_[key])
+            except AttributeError:
+                pass
+
+    def save(self, toSave, file_path):
+        states = {}
+        for key, val in toSave.__dict__.items():
+            try:
+                states[key] = val.get_state()
+            except AttributeError:
+                pass
+        with open(file_path, "w") as file:
+            for key, val in states.items():
+                if type(val) not in [list, tuple]:
+                    file.write(key+";"+val+"\n")
+                else:
+                    val = [str(v) for v in val]
+                    file.write(key+";"+";".join(val)+"\n")

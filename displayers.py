@@ -9,6 +9,9 @@ from functools import partial
 import tkinter as tk
 import tkinter.ttk as ttk
 from PIL import ImageTk, Image
+import pychord
+
+from VarPlus import StringVarPlus
 
 from vars import *
 from utils import *
@@ -32,10 +35,9 @@ class Score:
         self.player = player
         self.func_to_apply = funct_to_apply
         self.frame = ttk.Frame(master)
-        self.display_warning = False
         pframe = ttk.Frame(self.frame)
         rframe = ttk.LabelFrame(pframe, text=self.LM.get("alteration"))
-        self.selectedAlteration = tk.StringVar()
+        self.selectedAlteration = StringVarPlus(self.LM, "any")
         ttk.Radiobutton(rframe, text=self.LM.get("sharp"), variable=self.selectedAlteration, value="#",
                         command=self.__reapply).pack(side="top")
         ttk.Radiobutton(rframe, text=self.LM.get("flat"), variable=self.selectedAlteration, value="b",
@@ -49,12 +51,12 @@ class Score:
         self.octave_label = ttk.Label(oframe, text="0")
         self.octave_label.pack(side="left")
         oframe.pack(side="top")
-        self.selectedTranslationSV = tk.StringVar()
+        self.selectedTranslationSV = StringVarPlus(self.LM, "note")
         self.translationChooser = ttk.OptionMenu(pframe, self.selectedTranslationSV, None,
                                                  *self.LM.get_notes(all_notes.keys()), command=self.__reapply)
         ttk.Label(pframe, text=self.LM.get("translate_for")).pack(side="top")
-        self.selectedTranslationSV.set(LM.get_note("C"))
         self.translationChooser.pack(side="top")
+        self.selectedTranslationSV.set(self.LM.get_note("C"))
         pframe.pack(side="left")
         self.selectedAlteration.set("#")
         rframe = ttk.Frame(self.frame)
@@ -86,6 +88,15 @@ class Score:
             "note": self.__load_image("note.png", int(self.line_delta * 1.2), int(0.9 * self.line_delta)),
             "warn": self.__load_image("warn.png", int(self.line_delta * 2), int(2 * self.line_delta)),
         }
+
+    def set_state(self, states):
+        translation, octave_number, alteration = states
+        self.selectedTranslationSV.set_state(translation)
+        self.octaveNumber = int(octave_number)
+        self.selectedAlteration.set_state(alteration)
+
+    def get_state(self):
+        return self.selectedTranslationSV.get_state(), self.octaveNumber, self.selectedAlteration.get_state()
 
     def __load_image(self, file_name, lx, ly):
         return ImageTk.PhotoImage(
@@ -288,7 +299,7 @@ class Keyboard:
 class Guitar:
     """ This mimics a top view of a guitar to display the playable notes on it """
 
-    def __init__(self, master, LM, tuning=("E", "A", "D", "G", "B", "E")):
+    def __init__(self, master, LM):
         """ The init class creates a more or less empty skeleton of it
         :param master: the master container on which everything will be packed
         :param tuning: the initial tuning of the guitar
@@ -300,12 +311,11 @@ class Guitar:
         self.notesChoosers = []
         self.usableNotes = []
         for i in range(6):
-            self.selectedNotesSVList.append(tk.StringVar())
+            self.selectedNotesSVList.append(StringVarPlus(self.LM, "note"))
             self.notesChoosers.append(tk.OptionMenu(self.frame, self.selectedNotesSVList[-1],
                                                     *self.LM.get_notes(all_notes.keys()), command=self.__reapply))
             self.notesChoosers[-1].grid(column=0, row=i)
             ttk.Label(self.frame, text="-").grid(column=1, row=i)
-            self.selectedNotesSVList[-1].set(self.LM.get_note(tuning[5 - i]))
             temp = []
             for y in range(GUITAR_LENGTH - 1):
                 temp.append(tk.Button(self.frame, font="TkFixedFont", state=tk.DISABLED))
@@ -350,3 +360,10 @@ class Guitar:
         :param arg: completely ignored, the callback gives arguments that are not needed
         """
         self.apply(self.usableNotes)
+
+    def set_state(self, states):
+        for i in range(len(states)):
+            self.selectedNotesSVList[i].set_state(states[i])
+
+    def get_state(self):
+        return [_.get_state() for _ in self.selectedNotesSVList]
