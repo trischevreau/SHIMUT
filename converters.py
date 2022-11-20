@@ -16,8 +16,9 @@ def convert_french_to_english(note):
     :return: "C", "Dx", "Eb" for example
     """
     for k, v in english_notation.items():
-        if k in note:
-            return note.replace(k, v)
+        while k in note:
+            note = note.replace(k, v)
+    return note
 
 
 def convert_english_to_french(note):
@@ -26,14 +27,17 @@ def convert_english_to_french(note):
     :param note: "C", "Dx", "Eb", "D#dim" for example
     :return: "Do", "Réx", "Mib", "Ré#dim" for example
     """
-    h = note[0]  # the letter corresponding to the note
-    alt = note[1:]  # this is an empty string if the note is plain
+    replace_list = []
     for k, v in english_notation.items():  # reverse search in the dictionary
-        if v == h:
-            if len(alt) != 0:
-                return str(k + alt)
-            else:
-                return str(k)
+        for i in range(len(note)):
+            if note[i] == v:
+                replace_list.append((i, k))
+    delta = 0
+    replace_list.sort(key=lambda v: v[0])
+    replace_list.reverse()
+    for item in replace_list:
+        note = note[0:item[0]] + item[1] + note[item[0]+1:]
+    return note
 
 
 def convert_height_to_english(h):
