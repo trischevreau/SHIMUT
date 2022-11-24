@@ -188,6 +188,8 @@ class Main:
             for scalename, scaleprop in scales.items():
                 if group in scaleprop[2]:
                     self.usable_scales.append(scalename)
+        if len(self.usable_scales) == 0:
+            self.usable_scales.append("major")
         self.scaleChooser.set_menu(self.LM.get(self.usable_scales[0]), *[self.LM.get(e) for e in self.usable_scales])
 
 
