@@ -100,7 +100,7 @@ class Score:
 
     def __load_image(self, file_name, lx, ly):
         return ImageTk.PhotoImage(
-            Image.open("assets/"+file_name).convert("RGBA").resize((lx,ly)),
+            Image.open("assets/"+file_name).convert("RGBA").resize((lx, ly)),
             master=self.master)
 
     def __increment_octave(self):
@@ -167,7 +167,7 @@ class Score:
             self.display_warning = True
         return self.convert_table[n], alt
 
-    def display_note(self, n, xp):
+    def display_note(self, n, xp, color="black"):
         """
         Displays a note on the score
         :param n: the height of the note
@@ -175,12 +175,20 @@ class Score:
         """
         (h, alt) = self.convert_height(n)
         # prints the note on the canvas
-        self.canvas.create_image(self.x_positions[xp], self.height / 2 - (self.line_delta * (h / 2)),
-                                 anchor=tk.CENTER, image=self.images["note"])
+        if color == "black":
+            self.canvas.create_image(self.x_positions[xp], self.height / 2 - (self.line_delta * (h / 2)),
+                                     anchor=tk.CENTER, image=self.images["note"])
+        else:
+            lx, ly = (int(self.line_delta * 1.2), int(0.9 * self.line_delta))
+            self.canvas.create_oval(self.x_positions[xp] - lx / 2,
+                                    self.height / 2 - (self.line_delta * (h / 2)) - ly / 2,
+                                    self.x_positions[xp] + lx / 2,
+                                    self.height / 2 - (self.line_delta * (h / 2)) + ly / 2,
+                                    fill=color)
         # prints the alteration on the canvas
         if alt != "n":
             self.canvas.create_text(self.x_positions[xp] - 1.2 * self.line_delta,
-                                    self.height / 2 - self.line_delta * h / 2,
+                                    self.height / 2 - self.line_delta * h / 2, fill=color,
                                     text=alt, font=("TkFixedFont", int(self.line_delta)))
         # prints additionnal lines if needed
         while h <= -6 or h >= 5:
@@ -195,13 +203,16 @@ class Score:
             else:
                 h -= 1
 
-    def apply(self, scale):
+    def apply(self, set, colors="black"):
         """
         Apply a set of notes to the score
         :param scale: the set of notes can be seen as a list of chords or as a list of single notes (noted in heights)
         """
-        assert len(scale) <= len(self.x_positions)
-        self.notes = scale
+        assert len(set) <= len(self.x_positions)
+        if type(colors) == str:
+            colors = [[colors for y in range(len(set[i]))] for i in range(len(set))]
+        self.notes = set
+        self.colors = colors
         # fresh start
         self.do_initial()
         # transposition delta
@@ -211,10 +222,11 @@ class Score:
         # iterating the notes
         for i in range(len(self.notes)):
             if type(self.notes[i]) == list:  # if it's chords ...
-                for e in self.notes[i]:  # ... display each note
-                    self.display_note(e - self.delta + self.octaveNumber * 12, i)
+                for y in range(len(self.notes[i])):  # ... display each note
+                    self.display_note(self.notes[i][y] - self.delta + self.octaveNumber * 12, i, self.colors[i][y])
             elif type(self.notes[i]) == int:  # if it's single notes ...
-                self.display_note(self.notes[i] - self.delta + self.octaveNumber * 12, i)  # ... just display them
+                # ... just display them
+                self.display_note(self.notes[i] - self.delta + self.octaveNumber * 12, i, self.colors[i])
         # displaying annotations (chords name)
         for pos in range(len(self.annotations)):
             self.canvas.create_text(self.x_positions[pos], self.line_delta * (pos % 2 + 1),
@@ -248,7 +260,7 @@ class Score:
         """ Used as a callback function when the transposition is changed to update the score and the classes using it
         :param args: completely ignored, the callback gives arguments that are not needed
         """
-        self.apply(self.notes)
+        self.apply(self.notes, self.colors)
         self.func_to_apply()
 
 
@@ -325,6 +337,7 @@ class Guitar:
             if e[0] <= GUITAR_LENGTH:
                 tk.Label(self.frame, text=e[1], font=("TkFixedFont", 16)).grid(column=e[0], row=7)
         self.frame.pack(side="top")
+        self.instrument = None
 
     def initial_color(self):
         """ This takes back the guitar to its initial colors """
@@ -336,7 +349,7 @@ class Guitar:
 
     def apply(self, scale_to_apply):
         """
-        Applies a scale to the keyboard
+        Applies a scale to the guitar
         :param scale_to_apply: the notes to put on it
         """
         self.usableNotes = unoctaver(scale_to_apply)

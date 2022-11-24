@@ -48,32 +48,47 @@ circle = {
     "m": ["A", "E", "B", "F#", "C#", "G#", "D#", "A#", "D", "G", "C", "F", "Bb", "Eb", "Ab"],
 }
 
+class scale_groups:
+    def __init__(self):
+        self.CLASSIC = "classic"
+        self.DIATONIC = "diatonic"
+        self.PENTATONIC = "pentatonic"
+        self.HEXATONIC = "hexatonic"
+        self.FROM_MEL_MINOR = "from_melodic_minor"
+        self.FROM_HARM_MINOR = "from_harmonic_minor"
+
+sg = scale_groups()
+
 scales = {
-
-    "natural_minor": ([2, 1, 2, 2, 1, 2], circle["m"]),
-
-    "major": ([2, 2, 1, 2, 2, 2], circle["M"]),
-
-    "harmonic_minor": ([2, 1, 2, 2, 1, 3], circle["m"]),
-
-    "melodic_minor": ([2, 1, 2, 2, 2, 2], circle["m"]),
-
-    "pentatonic_major": ([2, 2, 3, 2], list(all_notes.keys())),
-
-    "pentatonic_minor": ([3, 2, 2, 3], list(all_notes.keys())),
-
-    "dorian": ([2, 1, 2, 2, 2, 1], list(all_notes.keys())),
-
-    "phrygian": ([1, 2, 2, 2, 1, 2], list(all_notes.keys())),
-
-    "lydian": ([2, 2, 2, 1, 2, 2], list(all_notes.keys())),
-
-    "mixolydian": ([2, 2, 1, 2, 2, 1], list(all_notes.keys())),
-
-    "locrian": ([1, 2, 2, 1, 2, 2], list(all_notes.keys())),
-
-    "whole_tone": ([2, 2, 2, 2, 2], list(all_notes.keys()))
-
+    #
+    "major": ([2, 2, 1, 2, 2, 2], circle["M"], [sg.DIATONIC, sg.CLASSIC]),
+    "dorian": ([2, 1, 2, 2, 2, 1], list(all_notes.keys()), [sg.DIATONIC]),
+    "phrygian": ([1, 2, 2, 2, 1, 2], list(all_notes.keys()), [sg.DIATONIC]),
+    "lydian": ([2, 2, 2, 1, 2, 2], list(all_notes.keys()), [sg.DIATONIC]),
+    "mixolydian": ([2, 2, 1, 2, 2, 1], list(all_notes.keys()), [sg.DIATONIC]),
+    "locrian": ([1, 2, 2, 1, 2, 2], list(all_notes.keys()), [sg.DIATONIC]),
+    "natural_minor": ([2, 1, 2, 2, 1, 2], circle["m"], [sg.DIATONIC]),
+    #
+    "whole_tone": ([2, 2, 2, 2, 2], list(all_notes.keys()), [sg.HEXATONIC]),
+    #
+    "pentatonic_major": ([2, 2, 3, 2], list(all_notes.keys()), [sg.PENTATONIC]),
+    "pentatonic_minor": ([3, 2, 2, 3], list(all_notes.keys()), [sg.PENTATONIC]),
+    #
+    "melodic_minor": ([2, 1, 2, 2, 2, 2], circle["m"], [sg.FROM_MEL_MINOR, sg.CLASSIC]),
+    "javanese": ([1, 2, 2, 2, 2, 1], list(all_notes.keys()), [sg.FROM_MEL_MINOR]),
+    "augmented_lydian": ([2, 2, 2, 2, 1, 2], list(all_notes.keys()), [sg.FROM_MEL_MINOR]),
+    "bartok": ([2, 2, 2, 1, 2, 1], list(all_notes.keys()), [sg.FROM_MEL_MINOR]),
+    "hindu": ([2, 2, 1, 2, 1, 2], list(all_notes.keys()), [sg.FROM_MEL_MINOR]),
+    "diminished_minor": ([2, 1, 2, 1, 2, 2], list(all_notes.keys()), [sg.FROM_MEL_MINOR]),
+    "altered": ([1, 2, 1, 2, 2, 2], list(all_notes.keys()), [sg.FROM_MEL_MINOR]),
+    #
+    "harmonic_minor": ([2, 1, 2, 2, 1, 3], circle["m"], [sg.CLASSIC, sg.FROM_HARM_MINOR]),
+    "arab": ([2, 2, 1, 1, 2, 2], list(all_notes.keys()), [sg.FROM_HARM_MINOR]),
+    "napolitan": ([1, 2, 2, 2, 2, 2], list(all_notes.keys()), [sg.FROM_HARM_MINOR]),
+    "oriental": ([1, 3, 1, 1, 3, 1], list(all_notes.keys()), [sg.FROM_HARM_MINOR]),
+    "bohemian": ([1, 3, 1, 2, 1, 3], list(all_notes.keys()), [sg.FROM_HARM_MINOR]),
+    "sebastian": ([3, 1, 2, 1, 3, 1], list(all_notes.keys()), [sg.FROM_HARM_MINOR]),
+    "gypsy": ([2, 1, 3, 1, 1, 3], list(all_notes.keys()), [sg.FROM_HARM_MINOR]),
 }
 
 progressions = {

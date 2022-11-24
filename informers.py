@@ -14,34 +14,91 @@ import displayers
 import converters
 
 
-class RelativeScales:
+class IntersectionsPanel:
     """
-    This class is meant to display relatives scales from the one selected
+    This class is meant to display intersections on the selected scale
     """
 
-    def __init__(self, root, LM):
+    def __init__(self, root, LM, player):
         """
         This builds the empty skeleton of the class
         :param root: the master frame to pack the elements to
+        :param LM: the language manager
         """
         self.LM = LM
-        self.frame = tk.LabelFrame(root, text="Gammes Relatives")
-        self.selectedRelativeScaleSV = tk.Variable(value=[])
-        self.relativesList = tk.Listbox(root, listvariable=self.selectedRelativeScaleSV, height=10,
-                                        font=("TkFixedFont", 14))
-        self.relativesList.pack(expand=True, fill=tk.BOTH)
-        self.frame.pack()
-        self.relatives = []
+        self.player = player
+        # Intersections
+        jframe = ttk.Frame(root)
+        pframe = ttk.LabelFrame(jframe, text=self.LM.get("parameters"))
+        self.selectedNumberOfIntersectionsToFind = StringVarPlus(LM, "any")
+        self.spinbox = ttk.Spinbox(pframe, from_=1, to=7, validate="key", state="readonly", command=self.__reapply,
+                                   textvariable=self.selectedNumberOfIntersectionsToFind, wrap=True)
+        self.spinbox.pack()
+        pframe.pack()
+        self.score = displayers.Score(jframe, self.LM, self.player, 600, 200, 7)
+        self.selectedScaleSV = tk.Variable(value=[])
+        self.intersectionList = tk.Listbox(jframe, listvariable=self.selectedScaleSV, height=10,
+                                           font=("TkFixedFont", 12))
+        scrollbar = ttk.Scrollbar(jframe)
+        scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
+        self.intersectionList.config(yscrollcommand=scrollbar.set)
+        scrollbar.config(command=self.intersectionList.yview)
+        self.intersectionList.pack(expand=True, fill=tk.BOTH)
+        jframe.pack(expand=True, fill=tk.BOTH)
+        self.intersecting = []
 
-    def apply(self, scale):
+    def apply(self, scale, note, usable_scales):
         """
-        This applies the selected scale to display its relative scales
+        This applies the selected scale to display its intersections
         :param scale: the scale
         """
-        self.relatives = relatives[tuple(sorted(unoctaver(scale)))]
-        self.relativesList.delete(0, 'end')
-        for e in self.relatives:
-            self.relativesList.insert(0, self.LM.get_note(e[1])+" - "+self.LM.get(e[0]))
+        self.intersecting = []
+        self.intersectionList.delete(0, 'end')
+        self.scale = scale
+        self.note = note
+        self.usable_scales = usable_scales
+        colors = ["red", "blue", "green", "magenta", "cyan", "orange"]
+        flattenened_scale = [i % 12 for i in scale]
+        to_find = int(self.selectedNumberOfIntersectionsToFind.get_state())
+        for scale_ in universe:
+            n = 0
+            for h in scale_[2]:
+                if h % 12 in flattenened_scale:
+                    n += 1
+            if n == to_find:
+                self.intersecting.append(scale_)
+        to_apply_set = [[] for i in range(7)]
+        to_apply_colors = [[] for i in range(7)]
+        for y in range(len(self.intersecting)):
+            elem = self.intersecting[y]
+            elem[2] = [e % 12 for e in elem[2]]
+            scores = []
+            d = 0
+            l, l_ = len(elem[2]), len(flattenened_scale)
+            for d in range(len(elem[2])):
+                scores.append((sum([elem[2][(d+i) % l] == flattenened_scale[i % l_] for i in range(len(elem[2]))]),
+                               d))
+            scores.sort(key=lambda z: z[0])
+            d = scores[-1][1]
+            if elem[0] in self.usable_scales:
+                for i in range(len(elem[2])):
+                    to_apply_set[i].append(elem[2][(d + i) % len(elem[2])])
+                    to_apply_colors[i].append(colors[y % len(colors)])
+                self.intersectionList.insert(0, self.LM.get_note(elem[1])+" - "+self.LM.get(elem[0]))
+                self.intersectionList.itemconfig(0, {'fg': colors[y % len(colors)]})
+        for i in range(len(flattenened_scale)):
+            to_apply_set[i].append(flattenened_scale[i])
+            to_apply_colors[i].append("black")
+        self.score.apply(to_apply_set, to_apply_colors)
+
+    def __reapply(self):
+        self.apply(self.scale, self.note, self.usable_scales)
+    def set_state(self, states):
+        self.score.set_state(states[0:3])
+        self.selectedNumberOfIntersectionsToFind.set(states[3])
+
+    def get_state(self):
+        return *self.score.get_state(),self.selectedNumberOfIntersectionsToFind.get_state()
 
 
 class Chords:

@@ -4,8 +4,9 @@ from random import choice
 import tkinter.ttk as ttk
 import os
 import pathlib
+from functools import partial
 
-from VarPlus import StringVarPlus
+from VarPlus import StringVarPlus, BooleanVarPlus, BooleanDictVarPlus
 
 import managers
 import displayers
@@ -35,6 +36,9 @@ class Main:
         self.scale = []
         self.lang_SV = StringVarPlus(self.LM, "any")
         self.conv_SV = StringVarPlus(self.LM, "any")
+        self.chosen_scales = BooleanDictVarPlus(len(sg.__dict__))
+        self.choosable_scales_names = [e[1] for e in sg.__dict__.items()]
+        self.usable_scales = []
 
         # Classes init 2
         self.player = managers.Player(0, 127, 0.2)
@@ -52,7 +56,7 @@ class Main:
         # Scale Type
         self.selectedScaleTypeSV = StringVarPlus(self.LM, "text_db")
         self.scaleChooser = ttk.OptionMenu(self.scaleParametersFrame, self.selectedScaleTypeSV, None,
-                                           *[self.LM.get(elem) for elem in scales.keys()], command=self.update_notes)
+                                           *[self.LM.get(elem) for elem in scales.keys()], command=self.__update_notes)
         self.scaleChooser.pack(side="right")
 
         # Scale height
@@ -100,11 +104,11 @@ class Main:
         self.chordsFrame.pack()
         self.mainNotebook.add(self.chordsFrame, text=self.LM.get("chords"))
 
-        # Scale Info
-        self.scaleInfoFrame = ttk.Frame(self.mainNotebook)
-        self.relatives = informers.RelativeScales(self.scaleInfoFrame, self.LM)
-        self.scaleInfoFrame.pack()
-        self.mainNotebook.add(self.scaleInfoFrame, text=self.LM.get("info"))
+        # Scale Intersections
+        self.scaleInterFrame = ttk.Frame(self.mainNotebook)
+        self.intersections = informers.IntersectionsPanel(self.scaleInterFrame, self.LM, self.player)
+        self.scaleInterFrame.pack()
+        self.mainNotebook.add(self.scaleInterFrame, text=self.LM.get("intersections"))
 
         # Chord progression
         self.chordProgFrame = ttk.Frame(self.mainNotebook)
@@ -117,7 +121,8 @@ class Main:
         """
 
         self.param_reader.set(self)
-        self.update_notes(self.selectedScaleTypeSV.get())
+        self.__update_notes(self.selectedScaleTypeSV.get())
+        self.__update_usable_scales()
 
         """
         Menus
@@ -133,6 +138,23 @@ class Main:
         filemenu.add_command(label=self.LM.get("panic"), command=self.__panic)
         filemenu.add_command(label=self.LM.get("exit"), command=self.quit)
         self.menubar.add_cascade(label=self.LM.get("file"), menu=filemenu)
+        # display
+        """
+        dispmenu = tk.Menu(self.menubar, tearoff=0)
+        instrmenu = tk.Menu(dispmenu, tearoff=0)
+        self.instr_SV = StringVarPlus(self.LM, "text_db")
+        for elem in ["guitar", "bass"]:
+            instrmenu.add_radiobutton(label=self.LM.get(elem), variable=self.instr_SV, value=elem,
+                                     command=self.__set_instr)
+        dispmenu.add_cascade(label=self.LM.get("cord_instrument"), menu=instrmenu)
+        self.menubar.add_cascade(label=self.LM.get("display"), menu=dispmenu)
+        """
+        # scales
+        scalesmenu = tk.Menu(self.menubar, tearoff=0)
+        for i in range(len(self.choosable_scales_names)):
+            scalesmenu.add_checkbutton(label=self.LM.get(self.choosable_scales_names[i]), onvalue=1, offvalue=0,
+                                       variable=self.chosen_scales.list_[i], command=self.__update_usable_scales)
+        self.menubar.add_cascade(label=self.LM.get("scales"), menu=scalesmenu)
         # internationalization menu
         intermenu = tk.Menu(self.menubar, tearoff=0)
         langmenu = tk.Menu(intermenu, tearoff=0)
@@ -155,6 +177,19 @@ class Main:
         self.root.wm_iconbitmap("assets/main_icon.ico")
         self.root.iconbitmap("assets/main_icon.ico")
         self.root.pack_slaves()
+
+    def __update_usable_scales(self):
+        self.usable_scales = []
+        groups = []
+        for i in range(len(self.chosen_scales)):
+            if self.chosen_scales[i].get_state() == 1:
+                groups.append(self.choosable_scales_names[i])
+        for group in groups:
+            for scalename, scaleprop in scales.items():
+                if group in scaleprop[2]:
+                    self.usable_scales.append(scalename)
+        self.scaleChooser.set_menu(self.LM.get(self.usable_scales[0]), *[self.LM.get(e) for e in self.usable_scales])
+
 
     def __load(self):
         file = fd.askopenfilename(
@@ -190,7 +225,7 @@ class Main:
         self.apply()
         self.root.mainloop()
 
-    def update_notes(self, scaleType):
+    def __update_notes(self, scaleType):
         self.usableScaleNotes = self.LM.get_notes(scales[self.LM.reverse_get(scaleType)][1])
         if self.selectedScaleNoteSV.get() not in self.usableScaleNotes:
             self.noteChooser.set_menu(self.usableScaleNotes[0], *self.usableScaleNotes)
@@ -203,10 +238,10 @@ class Main:
             scale.append((scale[-1] + interval))
         self.keyboard.apply(scale)
         self.guitar.apply(scale)
-        self.relatives.apply(scale)
         self.chords.apply(scale)
         self.chords2.apply(scale)
         self.chordProg.apply(scale)
+        self.intersections.apply(scale, self.selectedScaleNoteSV.get_state(), self.usable_scales)
         self.scale = scale
 
     def quit(self):

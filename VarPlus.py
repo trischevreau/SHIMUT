@@ -35,3 +35,24 @@ class BooleanVarPlus(BooleanVar):
 
     def set_state(self, v):
         self.set(bool(v))
+
+
+class BooleanDictVarPlus:
+
+    def __init__(self, n):
+        self.n = n
+        self.list_ = [BooleanVarPlus() for e in range(n)]
+
+    def __len__(self):
+        return self.n
+
+    def __getitem__(self, item):
+        return self.list_[item]
+
+    def get_state(self):
+        return [e.get_state() for e in self.list_]
+
+    def set_state(self, states):
+        assert self.n == len(states)
+        for i in range(len(self.list_)):
+            self.list_[i].set(states[i])
