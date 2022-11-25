@@ -30,46 +30,15 @@ class Score:
         :param ly: vertical size of the score
         :param n: the number of notes that can be displayed horizontally
         """
+        
         self.notes = []
         self.LM = LM
         self.player = player
         self.func_to_apply = funct_to_apply
         self.frame = ttk.Frame(master)
-        pframe = ttk.Frame(self.frame)
-        rframe = ttk.LabelFrame(pframe, text=self.LM.get("alteration"))
-        self.selectedAlteration = StringVarPlus(self.LM, "any")
-        ttk.Radiobutton(rframe, text=self.LM.get("sharp"), variable=self.selectedAlteration, value="#",
-                        command=self.__reapply).pack(side="top")
-        ttk.Radiobutton(rframe, text=self.LM.get("flat"), variable=self.selectedAlteration, value="b",
-                        command=self.__reapply).pack(side="top")
-        rframe.pack(side="top")
-        self.octaveNumber = 0
+        self.octave_number = 0
         self.delta = 0
-        oframe = ttk.LabelFrame(pframe, text=self.LM.get("octaves"))
-        ttk.Button(oframe, text="+", width=3, command=self.__increment_octave).pack(side="right")
-        ttk.Button(oframe, text="-", width=3, command=self.__decrement_octave).pack(side="left")
-        self.octave_label = ttk.Label(oframe, text="0")
-        self.octave_label.pack(side="left")
-        oframe.pack(side="top")
-        self.selectedTranslationSV = StringVarPlus(self.LM, "note")
-        self.translationChooser = ttk.OptionMenu(pframe, self.selectedTranslationSV, None,
-                                                 *self.LM.get_notes(all_notes.keys()), command=self.__reapply)
-        ttk.Label(pframe, text=self.LM.get("translate_for")).pack(side="top")
-        self.translationChooser.pack(side="top")
-        self.selectedTranslationSV.set(self.LM.get_note("C"))
-        pframe.pack(side="left")
-        self.selectedAlteration.set("#")
-        rframe = ttk.Frame(self.frame)
-        self.canvas = tk.Canvas(rframe, width=lx, height=ly, bg="ivory")
-        self.canvas.pack(side="top")
-        npframe = ttk.LabelFrame(rframe, text=self.LM.get("play"))
-        ttk.Button(npframe, text=self.LM.get("all"), command=self.__play_full).pack(side="left")
-        for i in range(n):
-            func = partial(self.__play_pos, i)
-            ttk.Button(npframe, text=str(i+1), command=func).pack(side="left")
-        npframe.pack(side="bottom")
-        rframe.pack(side="right")
-        self.frame.pack(side="top")
+
         (self.width, self.height) = (lx, ly)
         self.annotations = ["" for i in range(n)]
         self.padding = 0.1
@@ -88,15 +57,71 @@ class Score:
             "note": self.__load_image("note.png", int(self.line_delta * 1.2), int(0.9 * self.line_delta)),
             "warn": self.__load_image("warn.png", int(self.line_delta * 2), int(2 * self.line_delta)),
         }
+        
+        """
+        Parameters
+        """ 
+        
+        pframe = ttk.Frame(self.frame)
+        
+        # alterations
+        rframe = ttk.LabelFrame(pframe, text=self.LM.get("alteration"))
+        self.selected_alteration = StringVarPlus(self.LM, "any")
+        ttk.Radiobutton(rframe, text=self.LM.get("sharp"), variable=self.selected_alteration, value="#",
+                        command=self.__reapply).pack(side="top")
+        ttk.Radiobutton(rframe, text=self.LM.get("flat"), variable=self.selected_alteration, value="b",
+                        command=self.__reapply).pack(side="top")
+        rframe.pack(side="top")
+        self.selected_alteration.set("#")
+        
+        # octaves
+        oframe = ttk.LabelFrame(pframe, text=self.LM.get("octaves"))
+        ttk.Button(oframe, text="+", width=3, command=self.__increment_octave).pack(side="right")
+        ttk.Button(oframe, text="-", width=3, command=self.__decrement_octave).pack(side="left")
+        self.octave_label = ttk.Label(oframe, text="0")
+        self.octave_label.pack(side="left")
+        oframe.pack(side="top")
+        
+        # translation
+        self.selected_translation_SV = StringVarPlus(self.LM, "note")
+        translation_chooser = ttk.OptionMenu(pframe, self.selected_translation_SV, None,
+                                             *self.LM.get_notes(all_notes.keys()), command=self.__reapply)
+        ttk.Label(pframe, text=self.LM.get("translate_for")).pack(side="top")
+        translation_chooser.pack(side="top")
+        self.selected_translation_SV.set(self.LM.get_note("C"))
+
+        pframe.pack(side="left")
+
+        """
+        Canvas
+        """
+
+        rframe = ttk.Frame(self.frame)
+        self.canvas = tk.Canvas(rframe, width=lx, height=ly, bg="ivory")
+        self.canvas.pack(side="top")
+
+        """
+        Playback
+        """
+
+        npframe = ttk.LabelFrame(rframe, text=self.LM.get("play"))
+        ttk.Button(npframe, text=self.LM.get("all"), command=self.__play_full).pack(side="left")
+        for i in range(n):
+            func = partial(self.__play_pos, i)
+            ttk.Button(npframe, text=str(i+1), command=func).pack(side="left")
+        npframe.pack(side="bottom")
+        rframe.pack(side="right")
+
+        self.frame.pack(side="top")
 
     def set_state(self, states):
         translation, octave_number, alteration = states
-        self.selectedTranslationSV.set_state(translation)
-        self.octaveNumber = int(octave_number)
-        self.selectedAlteration.set_state(alteration)
+        self.selected_translation_SV.set_state(translation)
+        self.octave_number = int(octave_number)
+        self.selected_alteration.set_state(alteration)
 
     def get_state(self):
-        return self.selectedTranslationSV.get_state(), self.octaveNumber, self.selectedAlteration.get_state()
+        return self.selected_translation_SV.get_state(), self.octave_number, self.selected_alteration.get_state()
 
     def __load_image(self, file_name, lx, ly):
         return ImageTk.PhotoImage(
@@ -107,14 +132,14 @@ class Score:
         """
         Used as a callback function for the buttons that set the displayed octave.
         """
-        self.octaveNumber += 1
+        self.octave_number += 1
         self.__reapply()
 
     def __decrement_octave(self):
         """
         Used as a callback function for the buttons that set the displayed octave.
         """
-        self.octaveNumber -= 1
+        self.octave_number -= 1
         self.__reapply()
 
     def __play_pos(self, pos):
@@ -151,7 +176,7 @@ class Score:
         """
         alt = "n"
         if (n % 12) in [1, 3, 6, 8, 10]:  # if the note is altered ...
-            sa = self.selectedAlteration.get()
+            sa = self.selected_alteration.get()
             # ... make it stick to the lines and write the alteration
             if sa == "#":
                 n -= 1
@@ -216,17 +241,17 @@ class Score:
         # fresh start
         self.do_initial()
         # transposition delta
-        self.delta = all_notes_extended[self.LM.reverse_get_note(self.selectedTranslationSV.get())]
+        self.delta = all_notes_extended[self.LM.reverse_get_note(self.selected_translation_SV.get())]
         if self.delta > 6:  # this helps not putting the notes too high
             self.delta -= 12
         # iterating the notes
         for i in range(len(self.notes)):
             if type(self.notes[i]) == list:  # if it's chords ...
                 for y in range(len(self.notes[i])):  # ... display each note
-                    self.display_note(self.notes[i][y] - self.delta + self.octaveNumber * 12, i, self.colors[i][y])
+                    self.display_note(self.notes[i][y] - self.delta + self.octave_number * 12, i, self.colors[i][y])
             elif type(self.notes[i]) == int:  # if it's single notes ...
                 # ... just display them
-                self.display_note(self.notes[i] - self.delta + self.octaveNumber * 12, i, self.colors[i])
+                self.display_note(self.notes[i] - self.delta + self.octave_number * 12, i, self.colors[i])
         # displaying annotations (chords name)
         for pos in range(len(self.annotations)):
             self.canvas.create_text(self.x_positions[pos], self.line_delta * (pos % 2 + 1),
@@ -237,7 +262,7 @@ class Score:
                                      self.height - self.images["warn"].height(),
                                      anchor=tk.NW, image=self.images["warn"])
         # octave number
-        self.octave_label.config(text=str(self.octaveNumber))
+        self.octave_label.config(text=str(self.octave_number))
 
     def get_delta(self):
         """
@@ -273,13 +298,13 @@ class Keyboard:
         """
         self.LM = LM
         self.frame = ttk.LabelFrame(master, text=self.LM.get("keyboard"))
-        self.kbNoteButtonsList = []
+        self.kb_note_buttons = []
         for i in range(24):  # two octaves
-            self.kbNoteButtonsList.append(tk.Button(self.frame, font="TkFixedFont", state=tk.DISABLED))
+            self.kb_note_buttons.append(tk.Button(self.frame, font="TkFixedFont", state=tk.DISABLED))
             if i % 12 in [0, 2, 4, 5, 7, 9, 11]:  # if it is a white key
-                self.kbNoteButtonsList[-1].grid(column=i, row=1)
+                self.kb_note_buttons[-1].grid(column=i, row=1)
             else:  # if it is a black key
-                self.kbNoteButtonsList[-1].grid(column=i, row=0)
+                self.kb_note_buttons[-1].grid(column=i, row=0)
         self.frame.pack(side="top")
 
     def initial_color(self):
@@ -289,7 +314,7 @@ class Keyboard:
                 x = "white"
             else:
                 x = "black"
-            self.kbNoteButtonsList[i].config(bg=x, text="   ")
+            self.kb_note_buttons[i].config(bg=x, text="   ")
 
     def apply(self, usable_notes):
         """
@@ -302,10 +327,10 @@ class Keyboard:
             if i % 12 in usable_notes:
                 deg = usable_notes.index(i % 12) + 1
                 if deg == 1:
-                    self.kbNoteButtonsList[i].config(bg="lightblue")
+                    self.kb_note_buttons[i].config(bg="lightblue")
                 else:
-                    self.kbNoteButtonsList[i].config(bg="pink")
-                self.kbNoteButtonsList[i].config(text=fill_spaces(int_to_roman(deg), 3))
+                    self.kb_note_buttons[i].config(bg="pink")
+                self.kb_note_buttons[i].config(text=fill_spaces(int_to_roman(deg), 3))
 
 
 class Guitar:
@@ -318,21 +343,21 @@ class Guitar:
         """
         self.LM = LM
         self.frame = ttk.LabelFrame(master, text=self.LM.get("cords"))
-        self.noteButtonsList = []
-        self.selectedNotesSVList = []
-        self.notesChoosers = []
-        self.usableNotes = []
+        self.note_buttons = []
+        self.selected_notes_SV = []
+        self.notes_choosers = []
+        self.usable_notes = []
         for i in range(6):
-            self.selectedNotesSVList.append(StringVarPlus(self.LM, "note"))
-            self.notesChoosers.append(tk.OptionMenu(self.frame, self.selectedNotesSVList[-1],
-                                                    *self.LM.get_notes(all_notes.keys()), command=self.__reapply))
-            self.notesChoosers[-1].grid(column=0, row=i)
+            self.selected_notes_SV.append(StringVarPlus(self.LM, "note"))
+            self.notes_choosers.append(tk.OptionMenu(self.frame, self.selected_notes_SV[-1],
+                                                     *self.LM.get_notes(all_notes.keys()), command=self.__reapply))
+            self.notes_choosers[-1].grid(column=0, row=i)
             ttk.Label(self.frame, text="-").grid(column=1, row=i)
             temp = []
             for y in range(GUITAR_LENGTH - 1):
                 temp.append(tk.Button(self.frame, font="TkFixedFont", state=tk.DISABLED))
                 temp[-1].grid(column=1 + y, row=i)
-            self.noteButtonsList.append(temp)
+            self.note_buttons.append(temp)
         for e in GUITAR_DOTS:
             if e[0] <= GUITAR_LENGTH:
                 tk.Label(self.frame, text=e[1], font=("TkFixedFont", 16)).grid(column=e[0], row=7)
@@ -341,10 +366,10 @@ class Guitar:
 
     def initial_color(self):
         """ This takes back the guitar to its initial colors """
-        for e in self.noteButtonsList:
+        for e in self.note_buttons:
             for ee in e:
                 ee.config(bg="white", text="   ")
-        for e in self.notesChoosers:
+        for e in self.notes_choosers:
             e.config(bg="white")
 
     def apply(self, scale_to_apply):
@@ -352,31 +377,31 @@ class Guitar:
         Applies a scale to the guitar
         :param scale_to_apply: the notes to put on it
         """
-        self.usableNotes = unoctaver(scale_to_apply)
+        self.usable_notes = unoctaver(scale_to_apply)
         self.initial_color()
-        for i in range(len(self.noteButtonsList)):
-            for y in range(len(self.noteButtonsList[i]) + 1):
-                n = (y + all_notes[self.LM.reverse_get_note(self.selectedNotesSVList[i].get())])
-                if n % 12 in self.usableNotes:
-                    deg = self.usableNotes.index(n % 12) + 1
+        for i in range(len(self.note_buttons)):
+            for y in range(len(self.note_buttons[i]) + 1):
+                n = (y + all_notes[self.LM.reverse_get_note(self.selected_notes_SV[i].get())])
+                if n % 12 in self.usable_notes:
+                    deg = self.usable_notes.index(n % 12) + 1
                     if deg == 1:
                         color = "lightblue"
                     else:
                         color = "pink"
                     if y == 0:
-                        self.notesChoosers[i].config(bg=color)
+                        self.notes_choosers[i].config(bg=color)
                     else:
-                        self.noteButtonsList[i][y - 1].config(bg=color, text=fill_spaces(str(deg), 3))
+                        self.note_buttons[i][y - 1].config(bg=color, text=fill_spaces(str(deg), 3))
 
     def __reapply(self, *arg):
         """ Used as a callback function when the transposition is changed to update the display
         :param arg: completely ignored, the callback gives arguments that are not needed
         """
-        self.apply(self.usableNotes)
+        self.apply(self.usable_notes)
 
     def set_state(self, states):
         for i in range(len(states)):
-            self.selectedNotesSVList[i].set_state(states[i])
+            self.selected_notes_SV[i].set_state(states[i])
 
     def get_state(self):
-        return [_.get_state() for _ in self.selectedNotesSVList]
+        return [_.get_state() for _ in self.selected_notes_SV]

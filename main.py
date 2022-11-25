@@ -43,85 +43,74 @@ class Main:
         # Classes init 2
         self.player = managers.Player(0, 127, 0.2)
         self.menubar = tk.Menu(self.root)
-        self.mainNotebook = ttk.Notebook(self.root)
+        self.main_notebook = ttk.Notebook(self.root)
 
         """
-        Scale parameters
+        Parameters
         """
 
         # Parameter frames
-        self.parametersFrame = ttk.Frame(self.root)
-        self.scaleParametersFrame = ttk.LabelFrame(self.parametersFrame, text=self.LM.get("scale_parameters"),
-                                                   name="params")
+        parameters_frame = ttk.Frame(self.root)
+        scale_parameters_frame = ttk.LabelFrame(parameters_frame, text=self.LM.get("scale_parameters"),
+                                                     name="params")
         # Scale Type
-        self.selectedScaleTypeSV = StringVarPlus(self.LM, "text_db")
-        self.scaleChooser = ttk.OptionMenu(self.scaleParametersFrame, self.selectedScaleTypeSV, None,
+        self.selected_scale_type_SV = StringVarPlus(self.LM, "text_db")
+        self.scale_chooser = ttk.OptionMenu(scale_parameters_frame, self.selected_scale_type_SV, None,
                                            *[self.LM.get(elem) for elem in scales.keys()], command=self.__update_notes)
-        self.scaleChooser.pack(side="right")
+        self.scale_chooser.pack(side="right")
 
         # Scale height
-        self.usableScaleNotes = []
-        self.selectedScaleNoteSV = StringVarPlus(self.LM, "note")
-        self.noteChooser = ttk.OptionMenu(self.scaleParametersFrame, self.selectedScaleNoteSV, None)
-        self.noteChooser["menu"].delete(0, "end")
-        self.noteChooser.pack(side="left")
+        self.usable_scale_notes = []
+        self.selected_scale_note_SV = StringVarPlus(self.LM, "note")
+        self.note_chooser = ttk.OptionMenu(scale_parameters_frame, self.selected_scale_note_SV, None)
+        self.note_chooser["menu"].delete(0, "end")
+        self.note_chooser.pack(side="left")
 
-        self.scaleParametersFrame.grid(row=0, column=0)
+        scale_parameters_frame.grid(row=0, column=0)
 
-        """
-        Display Parameters
-        """
+        # Apply Button
+        ttk.Button(parameters_frame, text=self.LM.get("apply"), command=self.apply).grid(row=0, column=3)
 
-        self.displayParametersFrame = ttk.LabelFrame(self.parametersFrame, text=self.LM.get("display_parameters"))
-        self.displayParametersFrame.grid(row=0, column=1)
-
-        """
-        Apply Button
-        """
-
-        self.ApplyButton = ttk.Button(self.parametersFrame, text=self.LM.get("apply"), command=self.apply)
-        self.ApplyButton.grid(row=0, column=3)
-
-        self.parametersFrame.pack()
+        parameters_frame.pack()
 
         """
         Notebook Display
         """
 
-        self.mainNotebook.pack(expand=True)
+        self.main_notebook.pack(expand=True)
 
         # Display of instruments
-        self.instrumentsDisplayFrame = ttk.Frame(self.mainNotebook)
-        self.keyboard = displayers.Keyboard(self.instrumentsDisplayFrame, self.LM)
-        self.guitar = displayers.Guitar(self.instrumentsDisplayFrame, self.LM)
-        self.instrumentsDisplayFrame.pack()
-        self.mainNotebook.add(self.instrumentsDisplayFrame, text=self.LM.get("instruments"))
+        instruments_display_frame = ttk.Frame(self.main_notebook)
+        self.keyboard = displayers.Keyboard(instruments_display_frame, self.LM)
+        self.guitar = displayers.Guitar(instruments_display_frame, self.LM)
+        instruments_display_frame.pack()
+        self.main_notebook.add(instruments_display_frame, text=self.LM.get("instruments"))
 
         # Accords
-        self.chordsFrame = ttk.Frame(self.mainNotebook)
-        self.chords = informers.Chords(self.chordsFrame, self.LM, self.player, 600, 200, 7)
-        self.chords2 = informers.Chords(self.chordsFrame, self.LM, self.player, 600, 200, 7)
-        self.chordsFrame.pack()
-        self.mainNotebook.add(self.chordsFrame, text=self.LM.get("chords"))
+        chords_frame = ttk.Frame(self.main_notebook)
+        self.chords = informers.Chords(chords_frame, self.LM, self.player, 600, 200, 7)
+        self.chords2 = informers.Chords(chords_frame, self.LM, self.player, 600, 200, 7)
+        chords_frame.pack()
+        self.main_notebook.add(chords_frame, text=self.LM.get("chords"))
 
         # Scale Intersections
-        self.scaleInterFrame = ttk.Frame(self.mainNotebook)
-        self.intersections = informers.IntersectionsPanel(self.scaleInterFrame, self.LM, self.player)
-        self.scaleInterFrame.pack()
-        self.mainNotebook.add(self.scaleInterFrame, text=self.LM.get("intersections"))
+        scale_inter_frame = ttk.Frame(self.main_notebook)
+        self.intersections = informers.IntersectionsPanel(scale_inter_frame, self.LM, self.player)
+        scale_inter_frame.pack()
+        self.main_notebook.add(scale_inter_frame, text=self.LM.get("intersections"))
 
         # Chord progression
-        self.chordProgFrame = ttk.Frame(self.mainNotebook)
-        self.chordProg = informers.Progressions(self.chordProgFrame, self.LM, self.player, 600, 200, 7)
-        self.chordProgFrame.pack()
-        self.mainNotebook.add(self.chordProgFrame, text=self.LM.get("chord_progressions"))
+        chord_prog_frame = ttk.Frame(self.main_notebook)
+        self.chordProg = informers.Progressions(chord_prog_frame, self.LM, self.player, 600, 200, 7)
+        chord_prog_frame.pack()
+        self.main_notebook.add(chord_prog_frame, text=self.LM.get("chord_progressions"))
 
         """
         Default Parameters
         """
 
         self.param_reader.set(self)
-        self.__update_notes(self.selectedScaleTypeSV.get())
+        self.__update_notes(self.selected_scale_type_SV.get())
         self.__update_usable_scales()
 
         """
@@ -190,8 +179,12 @@ class Main:
                     self.usable_scales.append(scalename)
         if len(self.usable_scales) == 0:
             self.usable_scales.append("major")
-        self.scaleChooser.set_menu(self.LM.get(self.usable_scales[0]), *[self.LM.get(e) for e in self.usable_scales])
-
+        if self.selected_scale_type_SV.get_state() not in self.usable_scales:
+            self.scale_chooser.set_menu(self.LM.get(self.usable_scales[0]),
+                                       *[self.LM.get(e) for e in self.usable_scales])
+        else:
+            self.scale_chooser.set_menu(self.selected_scale_type_SV.get(),
+                                       *[self.LM.get(e) for e in self.usable_scales])
 
     def __load(self):
         file = fd.askopenfilename(
@@ -228,22 +221,22 @@ class Main:
         self.root.mainloop()
 
     def __update_notes(self, scaleType):
-        self.usableScaleNotes = self.LM.get_notes(scales[self.LM.reverse_get(scaleType)][1])
-        if self.selectedScaleNoteSV.get() not in self.usableScaleNotes:
-            self.noteChooser.set_menu(self.usableScaleNotes[0], *self.usableScaleNotes)
+        self.usable_scale_notes = self.LM.get_notes(scales[self.LM.reverse_get(scaleType)][1])
+        if self.selected_scale_note_SV.get() not in self.usable_scale_notes:
+            self.note_chooser.set_menu(self.usable_scale_notes[0], *self.usable_scale_notes)
         else:
-            self.noteChooser.set_menu(self.selectedScaleNoteSV.get(), *self.usableScaleNotes)
+            self.note_chooser.set_menu(self.selected_scale_note_SV.get(), *self.usable_scale_notes)
 
     def apply(self):
-        scale = [all_notes_extended[self.LM.reverse_get_note(self.selectedScaleNoteSV.get())]]
-        for interval in scales[self.LM.reverse_get(self.selectedScaleTypeSV.get())][0]:
+        scale = [all_notes_extended[self.LM.reverse_get_note(self.selected_scale_note_SV.get())]]
+        for interval in scales[self.LM.reverse_get(self.selected_scale_type_SV.get())][0]:
             scale.append((scale[-1] + interval))
         self.keyboard.apply(scale)
         self.guitar.apply(scale)
         self.chords.apply(scale)
         self.chords2.apply(scale)
         self.chordProg.apply(scale)
-        self.intersections.apply(scale, self.selectedScaleNoteSV.get_state(), self.usable_scales)
+        self.intersections.apply(scale, self.selected_scale_note_SV.get_state(), self.usable_scales)
         self.scale = scale
 
     def quit(self):

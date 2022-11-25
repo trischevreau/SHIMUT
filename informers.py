@@ -30,20 +30,22 @@ class IntersectionsPanel:
         # Intersections
         jframe = ttk.Frame(root)
         pframe = ttk.LabelFrame(jframe, text=self.LM.get("parameters"))
-        self.selectedNumberOfIntersectionsToFind = StringVarPlus(LM, "any")
-        self.spinbox = ttk.Spinbox(pframe, from_=1, to=7, validate="key", state="readonly", command=self.__reapply,
-                                   textvariable=self.selectedNumberOfIntersectionsToFind, wrap=True)
-        self.spinbox.pack()
+        self.selected_number_to_find_SV = StringVarPlus(LM, "any")
+        spinbox = ttk.Spinbox(pframe, from_=1, to=7, validate="key", state="readonly",
+                                   textvariable=self.selected_number_to_find_SV, wrap=True)
+        ttk.Button(pframe, command=self.__reapply, text=self.LM.get("apply")).grid(row=2, column=0)
+        ttk.Label(pframe, text=self.LM.get("intersections_to_find")).grid(row=1, column=0)
+        spinbox.grid(row=1, column=1)
         pframe.pack()
         self.score = displayers.Score(jframe, self.LM, self.player, 600, 200, 7)
-        self.selectedScaleSV = tk.Variable(value=[])
-        self.intersectionList = tk.Listbox(jframe, listvariable=self.selectedScaleSV, height=10,
-                                           font=("TkFixedFont", 12))
+        self.selected_scale_SV = tk.Variable(value=[])
+        self.intersections_list = tk.Listbox(jframe, listvariable=self.selected_scale_SV, height=10,
+                                             font=("TkFixedFont", 12))
         scrollbar = ttk.Scrollbar(jframe)
         scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
-        self.intersectionList.config(yscrollcommand=scrollbar.set)
-        scrollbar.config(command=self.intersectionList.yview)
-        self.intersectionList.pack(expand=True, fill=tk.BOTH)
+        self.intersections_list.config(yscrollcommand=scrollbar.set)
+        scrollbar.config(command=self.intersections_list.yview)
+        self.intersections_list.pack(expand=True, fill=tk.BOTH)
         jframe.pack(expand=True, fill=tk.BOTH)
         self.intersecting = []
 
@@ -53,13 +55,13 @@ class IntersectionsPanel:
         :param scale: the scale
         """
         self.intersecting = []
-        self.intersectionList.delete(0, 'end')
+        self.intersections_list.delete(0, 'end')
         self.scale = scale
         self.note = note
         self.usable_scales = usable_scales
         colors = ["red", "blue", "green", "magenta", "cyan", "orange"]
         flattenened_scale = [i % 12 for i in scale]
-        to_find = int(self.selectedNumberOfIntersectionsToFind.get_state())
+        to_find = int(self.selected_number_to_find_SV.get_state())
         for scale_ in universe:
             n = 0
             for h in scale_[2]:
@@ -84,8 +86,8 @@ class IntersectionsPanel:
                 for i in range(len(elem[2])):
                     to_apply_set[i].append(elem[2][(d + i) % len(elem[2])])
                     to_apply_colors[i].append(colors[y % len(colors)])
-                self.intersectionList.insert(0, self.LM.get_note(elem[1])+" - "+self.LM.get(elem[0]))
-                self.intersectionList.itemconfig(0, {'fg': colors[y % len(colors)]})
+                self.intersections_list.insert(0, self.LM.get_note(elem[1]) + " - " + self.LM.get(elem[0]))
+                self.intersections_list.itemconfig(0, {'fg': colors[y % len(colors)]})
         for i in range(len(flattenened_scale)):
             to_apply_set[i].append(flattenened_scale[i])
             to_apply_colors[i].append("black")
@@ -93,12 +95,13 @@ class IntersectionsPanel:
 
     def __reapply(self):
         self.apply(self.scale, self.note, self.usable_scales)
+
     def set_state(self, states):
         self.score.set_state(states[0:3])
-        self.selectedNumberOfIntersectionsToFind.set(states[3])
+        self.selected_number_to_find_SV.set(states[3])
 
     def get_state(self):
-        return *self.score.get_state(),self.selectedNumberOfIntersectionsToFind.get_state()
+        return *self.score.get_state(), self.selected_number_to_find_SV.get_state()
 
 
 class Chords:
@@ -130,7 +133,7 @@ class Chords:
             elem.pack(side="left")
         self.deg_frame.pack()
         self.frame.pack()
-        self.chordsList = []
+        self.chords_list = []
         self.scale = None
         self.player = player
 
@@ -138,7 +141,7 @@ class Chords:
         """
         Builds the chords list from the scale of the class
         """
-        self.chordsList = []
+        self.chords_list = []
         oct_sup = 0
         for starting_note in range(len(self.scale)):
             chord = []
@@ -150,16 +153,16 @@ class Chords:
                         while self.scale[index] + 12 * oct_sup < chord[-1]:
                             oct_sup += 1
                     chord.append(self.scale[index] + 12 * oct_sup)
-            self.chordsList.append(chord)
+            self.chords_list.append(chord)
 
     def display_chords_annotations(self):
         delta = self.score.get_delta()
-        for i in range(len(self.chordsList)):
+        for i in range(len(self.chords_list)):
             # search which chord it is to display it. Sometimes chords have multiple names, hence the [0] index
-            if self.chordsList[i] != []:
+            if self.chords_list[i] != []:
                 try:
                     self.score.add_annotation(i, self.LM.get_note(str(pychord.find_chords_from_notes(
-                        [converters.convert_height_to_english(h - delta) for h in self.chordsList[i]])[0])))
+                        [converters.convert_height_to_english(h - delta) for h in self.chords_list[i]])[0])))
                 except IndexError:
                     self.score.add_annotation(i, "-")
 
@@ -179,41 +182,41 @@ class Chords:
 
     def __reapply(self):
         self.from_scale()
-        self.score.apply(self.chordsList)
+        self.score.apply(self.chords_list)
         self.display_chords_annotations()
 
     def set_state(self, states):
         translation, octave_number, alteration, *d = states
         self.score.selectedTranslationSV.set_state(translation)
-        self.score.octaveNumber = int(octave_number)
-        self.score.selectedAlteration.set_state(alteration)
+        self.score.octave_number = int(octave_number)
+        self.score.selected_alteration.set_state(alteration)
         for i in range(len(self.deg_frame_checkboxes_SV)):
             self.deg_frame_checkboxes_SV[i].set(bool(int(d[i])))
 
     def get_state(self):
-        return self.score.selectedTranslationSV.get_state(), str(self.score.octaveNumber),\
-               self.score.selectedAlteration.get_state(), *[_.get_state() for _ in self.deg_frame_checkboxes_SV],
+        return self.score.selectedTranslationSV.get_state(), str(self.score.octave_number), \
+               self.score.selected_alteration.get_state(), *[_.get_state() for _ in self.deg_frame_checkboxes_SV],
 
 
 class Progressions(Chords):
 
     def __init__(self, root, LM, player, lx, ly, n):
         super().__init__(root, LM, player, lx, ly, n, func_to_apply=self.__reapply)
-        self.pframe = ttk.LabelFrame(root, text=self.LM.get("chord_progression_parameters"))
-        self.selected_progression = StringVarPlus(self.LM, "text_db")
-        progression_chooser = ttk.OptionMenu(self.pframe, self.selected_progression,
+        pframe = ttk.LabelFrame(root, text=self.LM.get("chord_progression_parameters"))
+        self.selected_progression_SV = StringVarPlus(self.LM, "text_db")
+        progression_chooser = ttk.OptionMenu(pframe, self.selected_progression_SV,
                                              self.LM.get("personalized"),
                                              *[self.LM.get(v) for v in progressions.keys()],
                                              command=self.__prog_changed)
         progression_chooser.pack(side="left", expand=True, fill=tk.BOTH)
-        self.selected_chords = []
+        self.selected_chords_SV = []
         self.chords_selectors = []
         for i in range(n):
-            self.selected_chords.append(StringVarPlus(self.LM, "any"))
-            self.chords_selectors.append(ttk.OptionMenu(self.pframe, self.selected_chords[-1], int_to_roman(i+1),
+            self.selected_chords_SV.append(StringVarPlus(self.LM, "any"))
+            self.chords_selectors.append(ttk.OptionMenu(pframe, self.selected_chords_SV[-1], int_to_roman(i + 1),
                                                         "", command=self.__chord_changed))
             self.chords_selectors[-1].pack(side="left")
-        self.pframe.pack()
+        pframe.pack()
 
     def __reapply(self):
         self.chordsList = []
@@ -221,12 +224,12 @@ class Progressions(Chords):
         chords.extend([v + "/" for v in chords])
         chords.append("0")
         for i in range(0, len(self.chords_selectors)):
-            val = int_to_roman(min(roman_to_int(self.selected_chords[i].get().replace("/", "")), len(self.scale)))
-            if "/" in self.selected_chords[i].get():
+            val = int_to_roman(min(roman_to_int(self.selected_chords_SV[i].get().replace("/", "")), len(self.scale)))
+            if "/" in self.selected_chords_SV[i].get():
                 val += "/"
             self.chords_selectors[i].set_menu(val, *chords)
-        for i in range(len(self.selected_chords)):
-            current = self.selected_chords[i].get()
+        for i in range(len(self.selected_chords_SV)):
+            current = self.selected_chords_SV[i].get()
             if current != "0":
                 inverted = False
                 chord = []
@@ -251,35 +254,35 @@ class Progressions(Chords):
 
     def __chord_changed(self, chord):
         found = False
-        t = [v.get() for v in self.selected_chords]
+        t = [v.get() for v in self.selected_chords_SV]
         for k, v in progressions.items():
             v.extend(["0" for _ in range(len(t) - len(v))])
             if v == t:
-                self.selected_progression.set(self.LM.get(k))
+                self.selected_progression_SV.set(self.LM.get(k))
                 found = True
         if not found:
-            self.selected_progression.set(self.LM.get("personalized"))
+            self.selected_progression_SV.set(self.LM.get("personalized"))
         self.__reapply()
 
     def __prog_changed(self, prog):
         p = progressions[self.LM.reverse_get(prog)]
-        p.extend(["0" for _ in range(len(self.selected_chords) - len(p))])
+        p.extend(["0" for _ in range(len(self.selected_chords_SV) - len(p))])
         for i in range(len(p)):
-            self.selected_chords[i].set(p[i])
+            self.selected_chords_SV[i].set(p[i])
         self.__reapply()
 
     def set_state(self, states):
         translation, octave_number, alteration, *d = states
         self.score.selectedTranslationSV.set_state(translation)
-        self.score.octaveNumber = int(octave_number)
-        self.score.selectedAlteration.set_state(alteration)
+        self.score.octave_number = int(octave_number)
+        self.score.selected_alteration.set_state(alteration)
         for i in range(len(self.deg_frame_checkboxes_SV)):
             self.deg_frame_checkboxes_SV[i].set(bool(int(d[i])))
-        for i in range(len(self.selected_chords)):
-            self.selected_chords[i].set(d[len(self.deg_frame_checkboxes_SV)+i])
-        self.selected_progression.set_state(d[-1])
+        for i in range(len(self.selected_chords_SV)):
+            self.selected_chords_SV[i].set(d[len(self.deg_frame_checkboxes_SV) + i])
+        self.selected_progression_SV.set_state(d[-1])
 
     def get_state(self):
-        return self.score.selectedTranslationSV.get_state(), str(self.score.octaveNumber),\
-               self.score.selectedAlteration.get_state(), *[_.get_state() for _ in self.deg_frame_checkboxes_SV],\
-               *[_.get_state() for _ in self.selected_chords], self.selected_progression.get_state()
+        return self.score.selectedTranslationSV.get_state(), str(self.score.octave_number), \
+               self.score.selected_alteration.get_state(), *[_.get_state() for _ in self.deg_frame_checkboxes_SV], \
+               *[_.get_state() for _ in self.selected_chords_SV], self.selected_progression_SV.get_state()
