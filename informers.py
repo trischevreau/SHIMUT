@@ -186,16 +186,13 @@ class Chords:
         self.display_chords_annotations()
 
     def set_state(self, states):
-        translation, octave_number, alteration, *d = states
-        self.score.selectedTranslationSV.set_state(translation)
-        self.score.octave_number = int(octave_number)
-        self.score.selected_alteration.set_state(alteration)
+        _, _, _, *d = states
+        self.score.set_state(states[0:3])
         for i in range(len(self.deg_frame_checkboxes_SV)):
             self.deg_frame_checkboxes_SV[i].set(bool(int(d[i])))
 
     def get_state(self):
-        return self.score.selectedTranslationSV.get_state(), str(self.score.octave_number), \
-               self.score.selected_alteration.get_state(), *[_.get_state() for _ in self.deg_frame_checkboxes_SV],
+        return *self.score.get_state(), *[_.get_state() for _ in self.deg_frame_checkboxes_SV],
 
 
 class Progressions(Chords):
@@ -219,7 +216,7 @@ class Progressions(Chords):
         pframe.pack()
 
     def __reapply(self):
-        self.chordsList = []
+        self.chords_list = []
         chords = [int_to_roman(v+1) for v in range(len(self.scale))]
         chords.extend([v + "/" for v in chords])
         chords.append("0")
@@ -246,10 +243,10 @@ class Progressions(Chords):
                         chord.append(self.scale[index] + 12 * oct_sup)
                 if inverted:
                     chord = chord[1:] + [chord[0] + 12]
-                self.chordsList.append(chord)
+                self.chords_list.append(chord)
             else:
-                self.chordsList.append([])
-        self.score.apply(self.chordsList)
+                self.chords_list.append([])
+        self.score.apply(self.chords_list)
         self.display_chords_annotations()
 
     def __chord_changed(self, chord):
@@ -272,10 +269,8 @@ class Progressions(Chords):
         self.__reapply()
 
     def set_state(self, states):
-        translation, octave_number, alteration, *d = states
-        self.score.selectedTranslationSV.set_state(translation)
-        self.score.octave_number = int(octave_number)
-        self.score.selected_alteration.set_state(alteration)
+        _, _, _, *d = states
+        self.score.set_state(states[0:3])
         for i in range(len(self.deg_frame_checkboxes_SV)):
             self.deg_frame_checkboxes_SV[i].set(bool(int(d[i])))
         for i in range(len(self.selected_chords_SV)):
@@ -283,6 +278,5 @@ class Progressions(Chords):
         self.selected_progression_SV.set_state(d[-1])
 
     def get_state(self):
-        return self.score.selectedTranslationSV.get_state(), str(self.score.octave_number), \
-               self.score.selected_alteration.get_state(), *[_.get_state() for _ in self.deg_frame_checkboxes_SV], \
+        return *self.score.get_state(), *[_.get_state() for _ in self.deg_frame_checkboxes_SV], \
                *[_.get_state() for _ in self.selected_chords_SV], self.selected_progression_SV.get_state()

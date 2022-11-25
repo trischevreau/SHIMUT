@@ -11,7 +11,6 @@ from VarPlus import StringVarPlus, BooleanVarPlus, BooleanDictVarPlus
 import managers
 import displayers
 import informers
-from managers import ParamReader
 from vars import *
 from utils import *
 
@@ -28,7 +27,7 @@ class Main:
         self.root = tk.Tk()
 
         # Classes init 1
-        self.param_reader = ParamReader()
+        self.param_reader = managers.ParamReader()
         self.param_reader.load(to_load)
         self.LM = managers.LanguageManager(self.param_reader.get("lang_SV"), self.param_reader.get("conv_SV"))
 
@@ -127,17 +126,7 @@ class Main:
         filemenu.add_command(label=self.LM.get("panic"), command=self.__panic)
         filemenu.add_command(label=self.LM.get("exit"), command=self.quit)
         self.menubar.add_cascade(label=self.LM.get("file"), menu=filemenu)
-        # display
-        """
-        dispmenu = tk.Menu(self.menubar, tearoff=0)
-        instrmenu = tk.Menu(dispmenu, tearoff=0)
-        self.instr_SV = StringVarPlus(self.LM, "text_db")
-        for elem in ["guitar", "bass"]:
-            instrmenu.add_radiobutton(label=self.LM.get(elem), variable=self.instr_SV, value=elem,
-                                     command=self.__set_instr)
-        dispmenu.add_cascade(label=self.LM.get("cord_instrument"), menu=instrmenu)
-        self.menubar.add_cascade(label=self.LM.get("display"), menu=dispmenu)
-        """
+
         # scales
         scalesmenu = tk.Menu(self.menubar, tearoff=0)
         for i in range(len(self.choosable_scales_names)):
