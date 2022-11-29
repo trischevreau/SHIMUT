@@ -19,7 +19,7 @@ class IntersectionsPanel:
     This class is meant to display intersections on the selected scale
     """
 
-    def __init__(self, root, LM, player):
+    def __init__(self, root, LM, player, lw, lh):
         """
         This builds the empty skeleton of the class
         :param root: the master frame to pack the elements to
@@ -37,7 +37,7 @@ class IntersectionsPanel:
         ttk.Label(pframe, text=self.LM.get("intersections_to_find")).grid(row=1, column=0)
         spinbox.grid(row=1, column=1)
         pframe.pack()
-        self.score = displayers.Score(jframe, self.LM, self.player, 600, 200, 7)
+        self.score = displayers.Score(jframe, self.LM, self.player, lw, lh, 7)
         self.selected_scale_SV = tk.Variable(value=[])
         self.intersections_list = tk.Listbox(jframe, listvariable=self.selected_scale_SV, height=10,
                                              font=("TkFixedFont", 12))

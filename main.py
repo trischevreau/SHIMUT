@@ -87,20 +87,21 @@ class Main:
 
         # Accords
         chords_frame = ttk.Frame(self.main_notebook)
-        self.chords = informers.Chords(chords_frame, self.LM, self.player, 600, 200, 7)
-        self.chords2 = informers.Chords(chords_frame, self.LM, self.player, 600, 200, 7)
+        self.chords = informers.Chords(chords_frame, self.LM, self.player, SCORE_WIDTH, SCORE_HEIGHT, 7)
+        self.chords2 = informers.Chords(chords_frame, self.LM, self.player, SCORE_WIDTH, SCORE_HEIGHT, 7)
         chords_frame.pack()
         self.main_notebook.add(chords_frame, text=self.LM.get("chords"))
 
         # Scale Intersections
         scale_inter_frame = ttk.Frame(self.main_notebook)
-        self.intersections = informers.IntersectionsPanel(scale_inter_frame, self.LM, self.player)
+        self.intersections = informers.IntersectionsPanel(scale_inter_frame, self.LM, self.player,
+                                                          SCORE_WIDTH, SCORE_HEIGHT)
         scale_inter_frame.pack()
         self.main_notebook.add(scale_inter_frame, text=self.LM.get("intersections"))
 
         # Chord progression
         chord_prog_frame = ttk.Frame(self.main_notebook)
-        self.chordProg = informers.Progressions(chord_prog_frame, self.LM, self.player, 600, 200, 7)
+        self.chordProg = informers.Progressions(chord_prog_frame, self.LM, self.player, SCORE_WIDTH, SCORE_HEIGHT, 7)
         chord_prog_frame.pack()
         self.main_notebook.add(chord_prog_frame, text=self.LM.get("chord_progressions"))
 
@@ -118,6 +119,7 @@ class Main:
 
         # init
         self.root.config(menu=self.menubar)
+
         # file
         filemenu = tk.Menu(self.menubar, tearoff=0)
         filemenu.add_command(label=self.LM.get("load"), command=self.__load)
@@ -133,6 +135,7 @@ class Main:
             scalesmenu.add_checkbutton(label=self.LM.get(self.choosable_scales_names[i]), onvalue=1, offvalue=0,
                                        variable=self.chosen_scales.list_[i], command=self.__update_usable_scales)
         self.menubar.add_cascade(label=self.LM.get("scales"), menu=scalesmenu)
+
         # internationalization menu
         intermenu = tk.Menu(self.menubar, tearoff=0)
         langmenu = tk.Menu(intermenu, tearoff=0)
@@ -164,7 +167,7 @@ class Main:
                 groups.append(self.choosable_scales_names[i])
         for group in groups:
             for scalename, scaleprop in scales.items():
-                if group in scaleprop[2]:
+                if group in scaleprop[2] and (scalename not in self.usable_scales):
                     self.usable_scales.append(scalename)
         if len(self.usable_scales) == 0:
             self.usable_scales.append("major")
