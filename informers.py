@@ -6,7 +6,7 @@ import tkinter as tk
 import tkinter.ttk as ttk
 import pychord
 
-from VarPlus import StringVarPlus, BooleanVarPlus
+from varplus import StringVarPlus, BooleanVarPlus
 
 from vars import *
 from utils import *
@@ -21,9 +21,11 @@ class IntersectionsPanel:
 
     def __init__(self, root, LM, player, lw, lh):
         """
-        This builds the empty skeleton of the class
-        :param root: the master frame to pack the elements to
-        :param LM: the language manager
+        This builds the empty skeleton of the class.
+
+        @param root: the master frame to pack the elements to
+        @param LM: the language manager
+        @returns: Ta mère
         """
         self.LM = LM
         self.player = player
@@ -31,11 +33,16 @@ class IntersectionsPanel:
         jframe = ttk.Frame(root)
         pframe = ttk.LabelFrame(jframe, text=self.LM.get("parameters"))
         self.selected_number_to_find_SV = StringVarPlus(LM, "any")
-        spinbox = ttk.Spinbox(pframe, from_=1, to=7, validate="key", state="readonly",
-                                   textvariable=self.selected_number_to_find_SV, wrap=True)
         ttk.Button(pframe, command=self.__reapply, text=self.LM.get("apply")).grid(row=2, column=0)
-        ttk.Label(pframe, text=self.LM.get("intersections_to_find")).grid(row=1, column=0)
-        spinbox.grid(row=1, column=1)
+        ttk.Label(pframe, text=self.LM.get("intersections_to_find")).grid(row=0, column=0)
+        self.check_buttons_SV = [BooleanVarPlus() for i in range(7)]
+        self.check_buttons = [
+            ttk.Checkbutton(pframe, text=int_to_roman(i+1), command=self.__reapply,
+                            variable=self.check_buttons_SV[i]) for i in range(7)
+        ]
+        for i in range(len(self.check_buttons)):
+            self.check_buttons_SV[i].set(False)
+            self.check_buttons[i].grid(column=1+i, row=0)
         pframe.pack()
         self.score = displayers.Score(jframe, self.LM, self.player, lw, lh, 7)
         self.selected_scale_SV = tk.Variable(value=[])
@@ -60,20 +67,22 @@ class IntersectionsPanel:
         self.note = note
         self.usable_scales = usable_scales
         colors = ["red", "blue", "green", "magenta", "cyan", "orange"]
-        flattenened_scale = [i % 12 for i in scale]
-        to_find = int(self.selected_number_to_find_SV.get_state())
+        flattenened_scale = [e % 12 for e in scale]
+        to_find = [flattenened_scale[i] for i in range(7)
+                   if (self.check_buttons_SV[i].get() and i < len(flattenened_scale))]
+        for i in range(len(self.check_buttons)):
+            if i >= len(flattenened_scale):
+                self.check_buttons[i].config(state=tk.DISABLED)
+            else:
+                self.check_buttons[i].config(state=tk.NORMAL)
         for scale_ in universe:
-            n = 0
-            for h in scale_[2]:
-                if h % 12 in flattenened_scale:
-                    n += 1
-            if n == to_find:
+            scale_[2] = [e % 12 for e in scale_[2]]
+            if set.issubset(set(to_find), set(scale_[2])):
                 self.intersecting.append(scale_)
         to_apply_set = [[] for i in range(7)]
         to_apply_colors = [[] for i in range(7)]
         for y in range(len(self.intersecting)):
             elem = self.intersecting[y]
-            elem[2] = [e % 12 for e in elem[2]]
             scores = []
             d = 0
             l, l_ = len(elem[2]), len(flattenened_scale)
@@ -98,10 +107,12 @@ class IntersectionsPanel:
 
     def set_state(self, states):
         self.score.set_state(states[0:3])
-        self.selected_number_to_find_SV.set(states[3])
+        for i in range(len(self.check_buttons)):
+            self.check_buttons_SV[i].set(states[3+i])
 
     def get_state(self):
-        return *self.score.get_state(), self.selected_number_to_find_SV.get_state()
+        return *self.score.get_state(),\
+               *[self.check_buttons_SV[i].get_state() for i in range(len(self.check_buttons_SV))]
 
 
 class Chords:

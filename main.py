@@ -6,7 +6,7 @@ import os
 import pathlib
 from functools import partial
 
-from VarPlus import StringVarPlus, BooleanVarPlus, BooleanDictVarPlus
+from varplus import StringVarPlus, BooleanVarPlus, BooleanDictVarPlus
 
 import managers
 import displayers

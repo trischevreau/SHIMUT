@@ -11,7 +11,7 @@ import tkinter.ttk as ttk
 from PIL import ImageTk, Image
 import pychord
 
-from VarPlus import StringVarPlus
+from varplus import StringVarPlus
 
 from vars import *
 from utils import *

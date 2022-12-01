@@ -1,5 +1,5 @@
 """
-This contains the internationalization tools for the software
+This contains the managing tools for the software
 """
 
 import sqlite3
@@ -105,7 +105,7 @@ class Player:
 
     def __init__(self, instrument, velocity, length):
         """
-        Initializes the class.
+        Initializes the class
         :param instrument: the selected midi instrument
         :param velocity: the velocity of each note that will be played
         :param length: the length of each note that will be played and the silence in between a series
@@ -118,7 +118,7 @@ class Player:
 
     def play_note(self, notes_list):
         """
-        Plays the notes.
+        Plays the notes
         :param notes_list: the notes to play. Example : [[chordnote1,chordnote2],[othernote1],...]
         """
         for notes in notes_list:

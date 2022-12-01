@@ -1,4 +1,4 @@
-lang_SV;FR
+lang_SV;EN
 conv_SV;french
 chosen_scales;1;0;0;0;0;0
 selected_scale_type_SV;major
@@ -6,5 +6,5 @@ selected_scale_note_SV;C
 guitar;E;B;G;D;A;E
 chords;C;0;#;1;0;1;0;1;0;0
 chords2;C;0;#;1;0;1;0;1;0;0
-intersections;C;0;#;1;1;1;1;1;1;1
+intersections;C;0;#;1
 chordProg;C;0;#;1;0;1;0;1;0;0;V;I;0;0;0;0;0;perfect_cadence
