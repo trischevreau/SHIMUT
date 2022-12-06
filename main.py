@@ -1,27 +1,25 @@
 import tkinter as tk
 from tkinter import filedialog as fd
-from random import choice
 import tkinter.ttk as ttk
-import os
 import pathlib
-from functools import partial
 
+import blocks.chords
+import blocks.intersectionsPanel
+import blocks.keyboard
 from varplus import StringVarPlus, BooleanVarPlus, BooleanDictVarPlus
 
-import managers
-import displayers
-import informers
+from tools import managers
+from tools.image import load_image
+
+from blocks import guitar, progressions
 from vars import *
-from utils import *
 
 
 class Main:
 
     def __init__(self, to_load="parameters/default.SHIMUTstate"):
         """
-        This creates the skeleton of the interface
-        :param lang: the language of the software
-        :param conv: the notation to use to display the notes
+        This creates the skeleton of the interface and the menubar
         """
 
         self.root = tk.Tk()
@@ -51,7 +49,7 @@ class Main:
         # Parameter frames
         parameters_frame = ttk.Frame(self.root)
         scale_parameters_frame = ttk.LabelFrame(parameters_frame, text=self.LM.get("scale_parameters"),
-                                                     name="params")
+                                                name="params")
         # Scale Type
         self.selected_scale_type_SV = StringVarPlus(self.LM, "text_db")
         self.scale_chooser = ttk.OptionMenu(scale_parameters_frame, self.selected_scale_type_SV, None,
@@ -80,28 +78,29 @@ class Main:
 
         # Display of instruments
         instruments_display_frame = ttk.Frame(self.main_notebook)
-        self.keyboard = displayers.Keyboard(instruments_display_frame, self.LM)
-        self.guitar = displayers.Guitar(instruments_display_frame, self.LM)
+        self.keyboard = blocks.keyboard.Keyboard(instruments_display_frame, self.LM)
+        self.guitar = blocks.guitar.Guitar(instruments_display_frame, self.LM)
         instruments_display_frame.pack()
         self.main_notebook.add(instruments_display_frame, text=self.LM.get("instruments"))
 
         # Accords
         chords_frame = ttk.Frame(self.main_notebook)
-        self.chords = informers.Chords(chords_frame, self.LM, self.player, SCORE_WIDTH, SCORE_HEIGHT, 7)
-        self.chords2 = informers.Chords(chords_frame, self.LM, self.player, SCORE_WIDTH, SCORE_HEIGHT, 7)
+        self.chords = blocks.chords.Chords(chords_frame, self.LM, self.player, SCORE_WIDTH, SCORE_HEIGHT, 7)
+        self.chords2 = blocks.chords.Chords(chords_frame, self.LM, self.player, SCORE_WIDTH, SCORE_HEIGHT, 7)
         chords_frame.pack()
         self.main_notebook.add(chords_frame, text=self.LM.get("chords"))
 
         # Scale Intersections
         scale_inter_frame = ttk.Frame(self.main_notebook)
-        self.intersections = informers.IntersectionsPanel(scale_inter_frame, self.LM, self.player,
-                                                          SCORE_WIDTH, SCORE_HEIGHT)
+        self.intersections = blocks.intersectionsPanel.IntersectionsPanel(scale_inter_frame, self.LM, self.player,
+                                                                          SCORE_WIDTH, SCORE_HEIGHT)
         scale_inter_frame.pack()
         self.main_notebook.add(scale_inter_frame, text=self.LM.get("intersections"))
 
         # Chord progression
         chord_prog_frame = ttk.Frame(self.main_notebook)
-        self.chordProg = informers.Progressions(chord_prog_frame, self.LM, self.player, SCORE_WIDTH, SCORE_HEIGHT, 7)
+        self.chordProg = blocks.progressions.Progressions(
+            chord_prog_frame, self.LM, self.player, SCORE_WIDTH, SCORE_HEIGHT, 7)
         chord_prog_frame.pack()
         self.main_notebook.add(chord_prog_frame, text=self.LM.get("chord_progressions"))
 
@@ -212,8 +211,8 @@ class Main:
         self.apply()
         self.root.mainloop()
 
-    def __update_notes(self, scaleType):
-        self.usable_scale_notes = self.LM.get_notes(scales[self.LM.reverse_get(scaleType)][1])
+    def __update_notes(self, scale_type):
+        self.usable_scale_notes = self.LM.get_notes(scales[self.LM.reverse_get(scale_type)][1])
         if self.selected_scale_note_SV.get() not in self.usable_scale_notes:
             self.note_chooser.set_menu(self.usable_scale_notes[0], *self.usable_scale_notes)
         else:

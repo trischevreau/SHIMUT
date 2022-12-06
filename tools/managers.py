@@ -3,7 +3,7 @@ This contains the managing tools for the software
 """
 
 import sqlite3
-import converters
+from tools import converters
 import pygame.midi as midi
 from time import sleep
 

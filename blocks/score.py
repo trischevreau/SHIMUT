@@ -1,20 +1,10 @@
-"""
-This file contains classes named "displayers".
-They are elements meant to be used as elements of other classes if needed, but they can also be stand-alones.
-Anyway they use a master container to be displayed on a root.
-"""
-
-from functools import partial
-
 import tkinter as tk
-import tkinter.ttk as ttk
-from PIL import ImageTk, Image
-import pychord
+from functools import partial
+from tkinter import ttk as ttk
 
+from tools.image import load_image
 from varplus import StringVarPlus
-
-from vars import *
-from utils import *
+from vars import all_notes, all_notes_extended
 
 
 class Score:
@@ -30,7 +20,7 @@ class Score:
         :param ly: vertical size of the score
         :param n: the number of notes that can be displayed horizontally
         """
-        
+
         self.notes = []
         self.LM = LM
         self.player = player
@@ -53,17 +43,17 @@ class Score:
         }
         self.master = master
         self.images = {
-            "sol_clef": self.__load_image("clef.png", int(self.line_delta * 4), int(self.line_delta * 8)),
-            "note": self.__load_image("note.png", int(self.line_delta * 1.2), int(0.9 * self.line_delta)),
-            "warn": self.__load_image("warn.png", int(self.line_delta * 2), int(2 * self.line_delta)),
+            "sol_clef": load_image("clef.png", int(self.line_delta * 4), int(self.line_delta * 8)),
+            "note": load_image("note.png", int(self.line_delta * 1.2), int(0.9 * self.line_delta)),
+            "warn": load_image("warn.png", int(self.line_delta * 2), int(2 * self.line_delta)),
         }
-        
+
         """
         Parameters
-        """ 
-        
+        """
+
         pframe = ttk.Frame(self.frame)
-        
+
         # alterations
         rframe = ttk.LabelFrame(pframe, text=self.LM.get("alteration"))
         self.selected_alteration = StringVarPlus(self.LM, "any")
@@ -73,7 +63,7 @@ class Score:
                         command=self.__reapply).pack(side="top")
         rframe.pack(side="top")
         self.selected_alteration.set("#")
-        
+
         # octaves
         oframe = ttk.LabelFrame(pframe, text=self.LM.get("octaves"))
         ttk.Button(oframe, text="+", width=3, command=self.__increment_octave).pack(side="right")
@@ -81,7 +71,7 @@ class Score:
         self.octave_label = ttk.Label(oframe, text="0")
         self.octave_label.pack(side="left")
         oframe.pack(side="top")
-        
+
         # translation
         self.selected_translation_SV = StringVarPlus(self.LM, "note")
         translation_chooser = ttk.OptionMenu(pframe, self.selected_translation_SV, None,
@@ -122,11 +112,6 @@ class Score:
 
     def get_state(self):
         return self.selected_translation_SV.get_state(), self.octave_number, self.selected_alteration.get_state()
-
-    def __load_image(self, file_name, lx, ly):
-        return ImageTk.PhotoImage(
-            Image.open("assets/"+file_name).convert("RGBA").resize((lx, ly)),
-            master=self.master)
 
     def __increment_octave(self):
         """
@@ -287,121 +272,3 @@ class Score:
         """
         self.apply(self.notes, self.colors)
         self.func_to_apply()
-
-
-class Keyboard:
-    """ Mimics a keyboard to display a scale on it. """
-
-    def __init__(self, master, LM):
-        """ The init class creates a more or less empty skeleton of it
-        :param master: the master container on which everything will be packed
-        """
-        self.LM = LM
-        self.frame = ttk.LabelFrame(master, text=self.LM.get("keyboard"))
-        self.kb_note_buttons = []
-        for i in range(24):  # two octaves
-            self.kb_note_buttons.append(tk.Button(self.frame, font="TkFixedFont", state=tk.DISABLED))
-            if i % 12 in [0, 2, 4, 5, 7, 9, 11]:  # if it is a white key
-                self.kb_note_buttons[-1].grid(column=i, row=1)
-            else:  # if it is a black key
-                self.kb_note_buttons[-1].grid(column=i, row=0)
-        self.frame.pack(side="top")
-
-    def initial_color(self):
-        """ This takes back the keyboard to it's initial colors """
-        for i in range(24):
-            if i % 12 in [0, 2, 4, 5, 7, 9, 11]:
-                x = "white"
-            else:
-                x = "black"
-            self.kb_note_buttons[i].config(bg=x, text="   ")
-
-    def apply(self, usable_notes):
-        """
-        Applies a scale to the keyboard.
-        :param usable_notes: the notes to put on it
-        """
-        usable_notes = unoctaver(usable_notes)
-        self.initial_color()
-        for i in range(24):
-            if i % 12 in usable_notes:
-                deg = usable_notes.index(i % 12) + 1
-                if deg == 1:
-                    self.kb_note_buttons[i].config(bg="lightblue")
-                else:
-                    self.kb_note_buttons[i].config(bg="pink")
-                self.kb_note_buttons[i].config(text=fill_spaces(int_to_roman(deg), 3))
-
-
-class Guitar:
-    """ This mimics a top view of a guitar to display the playable notes on it """
-
-    def __init__(self, master, LM):
-        """ The init class creates a more or less empty skeleton of it
-        :param master: the master container on which everything will be packed
-        :param tuning: the initial tuning of the guitar
-        """
-        self.LM = LM
-        self.frame = ttk.LabelFrame(master, text=self.LM.get("cords"))
-        self.note_buttons = []
-        self.selected_notes_SV = []
-        self.notes_choosers = []
-        self.usable_notes = []
-        for i in range(6):
-            self.selected_notes_SV.append(StringVarPlus(self.LM, "note"))
-            self.notes_choosers.append(tk.OptionMenu(self.frame, self.selected_notes_SV[-1],
-                                                     *self.LM.get_notes(all_notes.keys()), command=self.__reapply))
-            self.notes_choosers[-1].grid(column=0, row=i)
-            ttk.Label(self.frame, text="-").grid(column=1, row=i)
-            temp = []
-            for y in range(GUITAR_LENGTH - 1):
-                temp.append(tk.Button(self.frame, font="TkFixedFont", state=tk.DISABLED))
-                temp[-1].grid(column=1 + y, row=i)
-            self.note_buttons.append(temp)
-        for e in GUITAR_DOTS:
-            if e[0] <= GUITAR_LENGTH:
-                tk.Label(self.frame, text=e[1], font=("TkFixedFont", 16)).grid(column=e[0], row=7)
-        self.frame.pack(side="top")
-        self.instrument = None
-
-    def initial_color(self):
-        """ This takes back the guitar to its initial colors """
-        for e in self.note_buttons:
-            for ee in e:
-                ee.config(bg="white", text="   ")
-        for e in self.notes_choosers:
-            e.config(bg="white")
-
-    def apply(self, scale_to_apply):
-        """
-        Applies a scale to the guitar
-        :param scale_to_apply: the notes to put on it
-        """
-        self.usable_notes = unoctaver(scale_to_apply)
-        self.initial_color()
-        for i in range(len(self.note_buttons)):
-            for y in range(len(self.note_buttons[i]) + 1):
-                n = (y + all_notes[self.LM.reverse_get_note(self.selected_notes_SV[i].get())])
-                if n % 12 in self.usable_notes:
-                    deg = self.usable_notes.index(n % 12) + 1
-                    if deg == 1:
-                        color = "lightblue"
-                    else:
-                        color = "pink"
-                    if y == 0:
-                        self.notes_choosers[i].config(bg=color)
-                    else:
-                        self.note_buttons[i][y - 1].config(bg=color, text=fill_spaces(str(deg), 3))
-
-    def __reapply(self, *arg):
-        """ Used as a callback function when the transposition is changed to update the display
-        :param arg: completely ignored, the callback gives arguments that are not needed
-        """
-        self.apply(self.usable_notes)
-
-    def set_state(self, states):
-        for i in range(len(states)):
-            self.selected_notes_SV[i].set_state(states[i])
-
-    def get_state(self):
-        return [_.get_state() for _ in self.selected_notes_SV]
