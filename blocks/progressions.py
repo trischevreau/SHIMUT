@@ -1,7 +1,3 @@
-"""
-informers are displayers not meant to be construction bricks
-"""
-
 import tkinter as tk
 import tkinter.ttk as ttk
 
@@ -15,6 +11,15 @@ from tools.utils import *
 class Progressions(Chords):
 
     def __init__(self, root, LM, player, lx, ly, n):
+        """
+        Creates the skeleton of the chords progressions manager
+        :param root: the root of the block
+        :param LM: the language manager
+        :param player: the midi player
+        :param lx: the width of the score
+        :param ly: the height of the score
+        :param n: the number of available notes on the scores
+        """
         super().__init__(root, LM, player, lx, ly, n, func_to_apply=self.__reapply)
         pframe = ttk.LabelFrame(root, text=self.LM.get("chord_progression_parameters"))
         self.selected_progression_SV = StringVarPlus(self.LM, "text_db")
@@ -33,6 +38,10 @@ class Progressions(Chords):
         pframe.pack()
 
     def __reapply(self):
+        """
+        Applies the same chords once again.
+        :return:
+        """
         self.chords_list = []
         chords = [int_to_roman(v+1) for v in range(len(self.scale))]
         chords.extend([v + "/" for v in chords])
@@ -66,7 +75,12 @@ class Progressions(Chords):
         self.score.apply(self.chords_list)
         self.display_chords_annotations()
 
-    def __chord_changed(self, chord):
+    def __chord_changed(self, _):
+        """
+        Sets the selected progression according to what the user chose
+        :param _: ignored (callback from tkinter)
+        :return:
+        """
         found = False
         t = [v.get() for v in self.selected_chords_SV]
         for k, v in progressions.items():
@@ -79,6 +93,11 @@ class Progressions(Chords):
         self.__reapply()
 
     def __prog_changed(self, prog):
+        """
+        Sets the option menu in accordance to the rest.
+        :param prog:
+        :return:
+        """
         p = progressions[self.LM.reverse_get(prog)]
         p.extend(["0" for _ in range(len(self.selected_chords_SV) - len(p))])
         for i in range(len(p)):

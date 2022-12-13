@@ -19,7 +19,7 @@ class Guitar:
     def __init__(self, master, LM):
         """ The init class creates a more or less empty skeleton of it
         :param master: the master container on which everything will be packed
-        :param tuning: the initial tuning of the guitar
+        :param LM: the language manager
         """
         self.LM = LM
         self.frame = ttk.LabelFrame(master, text=self.LM.get("cords"))

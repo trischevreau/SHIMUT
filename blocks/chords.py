@@ -18,10 +18,12 @@ class Chords:
         """
         This initializes external classes and creates the skeleton
         :param root: the master frame to pack the elements to
+        :param LM: the language manager
         :param player: the audio player
         :param lx: the horizontal length of the score
         :param ly: the vertical length of the score
         :param n: the number of notes that can be put on a score horizontally
+        :param func_to_apply: the function to call each time the score changes.
         """
         self.LM = LM
         self.frame = ttk.Frame(root)
@@ -61,6 +63,10 @@ class Chords:
             self.chords_list.append(chord)
 
     def display_chords_annotations(self):
+        """
+        Displays chords annotations.
+        :return:
+        """
         delta = self.score.get_delta()
         for i in range(len(self.chords_list)):
             # search which chord it is to display it. Sometimes chords have multiple names, hence the [0] index
@@ -86,6 +92,7 @@ class Chords:
         self.func_to_apply()
 
     def __reapply(self):
+        """ Applies everything once again. """
         self.from_scale()
         self.score.apply(self.chords_list)
         self.display_chords_annotations()

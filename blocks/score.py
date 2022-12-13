@@ -22,12 +22,14 @@ class Score:
         """
 
         self.notes = []
+        self.colors = []
         self.LM = LM
         self.player = player
         self.func_to_apply = funct_to_apply
         self.frame = ttk.Frame(master)
         self.octave_number = 0
         self.delta = 0
+        self.display_warning = False
 
         (self.width, self.height) = (lx, ly)
         self.annotations = ["" for i in range(n)]
@@ -213,21 +215,22 @@ class Score:
             else:
                 h -= 1
 
-    def apply(self, set, colors="black"):
+    def apply(self, set_, colors="black"):
         """
         Apply a set of notes to the score
-        :param scale: the set of notes can be seen as a list of chords or as a list of single notes (noted in heights)
+        :param set_: the set of notes can be seen as a list of chords or as a list of single notes (noted in heights)
+        :param colors: the colors of the notes (or one color for them all)
         """
-        assert len(set) <= len(self.x_positions)
+        assert len(set_) <= len(self.x_positions)
         if type(colors) == str:
-            colors = [[colors for y in range(len(set[i]))] for i in range(len(set))]
-        self.notes = set
+            colors = [[colors for _ in range(len(set_[i]))] for i in range(len(set_))]
+        self.notes = set_
         self.colors = colors
         # fresh start
         self.do_initial()
         # transposition delta
         self.delta = all_notes_extended[self.LM.reverse_get_note(self.selected_translation_SV.get())]
-        if self.delta > 6:  # this helps not putting the notes too high
+        if self.delta > 6:  # this makes the scores more readable
             self.delta -= 12
         # iterating the notes
         for i in range(len(self.notes)):

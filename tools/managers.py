@@ -1,5 +1,5 @@
 """
-This contains the managing tools for the software
+This contains the managing tools for the software.
 """
 
 import sqlite3
@@ -134,12 +134,20 @@ class Player:
         midi.quit()
 
 
-class ParamReader:
+class StateReader:
+
+    """ This class reads states from files to apply it to every instance contained in the main class. """
 
     def __init__(self):
         self.file_path = None
+        self.dict_ = None
 
     def load(self, file_path):
+        """
+        Loads the states from a shimut_state file
+        :param file_path: the path of the shimut_state file
+        :return:
+        """
         self.file_path = file_path
         self.dict_ = {}
         with open(self.file_path, "r") as file:
@@ -152,21 +160,37 @@ class ParamReader:
         return self.dict_
 
     def get(self, name):
+        """
+        Returns the state for a specific name.
+        :param name: the name of the instance
+        :return: the state
+        """
         if self.file_path is not None:
             return self.dict_[name]
         else:
             raise ValueError
 
-    def set(self, toSet):
-        for key, val in toSet.__dict__.items():
+    def set(self, to_set):
+        """
+        Sets the states of an instance
+        :param to_set: the class to run through
+        :return:
+        """
+        for key, val in to_set.__dict__.items():
             try:
                 val.set_state(self.dict_[key])
             except AttributeError:
                 pass
 
-    def save(self, toSave, file_path):
+    def save(self, to_save, file_path):
+        """
+        Saves the parameters from an instance to a shimut_state file.
+        :param to_save: instance that needs to be saved
+        :param file_path: the path to save it to
+        :return:
+        """
         states = {}
-        for key, val in toSave.__dict__.items():
+        for key, val in to_save.__dict__.items():
             try:
                 states[key] = val.get_state()
             except AttributeError:

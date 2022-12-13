@@ -1,3 +1,7 @@
+"""
+Contains all the constants.
+"""
+
 from tools.utils import unoctaver
 
 english_notation = {
@@ -131,3 +135,7 @@ GUITAR_DOTS = [(3, "*"), (5, "*"), (7, "*"), (9, "*"), (12, "**"), (15, "*"), (1
 
 SCORE_WIDTH = 600
 SCORE_HEIGHT = 200
+
+MIDI_INSTRUMENT = 0
+MIDI_VELOCITY = 127
+MIDI_NOTE_LENGTH = 0.2

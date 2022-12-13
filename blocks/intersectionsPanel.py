@@ -15,12 +15,17 @@ class IntersectionsPanel:
     def __init__(self, root, language_manager, player, lw, lh):
         """
         This builds the empty skeleton of the class
-
         :param root: the master frame to pack the elements to
         :param language_manager: the language manager
+        :param player: the midi player
+        :param lw: the width of the score
+        :param lh: the height of the score
         """
         self.LM = language_manager
         self.player = player
+        self.scale = []
+        self.note = None
+        self.usable_scales = []
         # Intersections
         jframe = ttk.Frame(root)
         pframe = ttk.LabelFrame(jframe, text=self.LM.get("parameters"))
@@ -95,6 +100,7 @@ class IntersectionsPanel:
         self.score.apply(to_apply_set, to_apply_colors)
 
     def __reapply(self):
+        """ Applies the scale, note and usable_scale once again. """
         self.apply(self.scale, self.note, self.usable_scales)
 
     def set_state(self, states):

@@ -1,3 +1,8 @@
+"""
+Contains all the useful functions.
+"""
+
+
 def int_to_roman(v):
     """
     Returns the roman notation of an integer between 1 and 12
@@ -35,15 +40,15 @@ def roman_to_int(v):
             return i
 
 
-def fill_spaces(s, l):
+def fill_spaces(s, length):
     """
     Fills with spaces to make a string to a certain length
     :param s: the string
-    :param l: the length it should be
+    :param length: the length it should be
     :return: the string at the length it should be
     """
-    assert len(s) <= l
-    return s+" "*(l-len(s))
+    assert len(s) <= length
+    return s+" "*(length-len(s))
 
 
 def unoctaver(to_scale):
@@ -69,4 +74,3 @@ def unlistify(list_):
         return list_[0]
     else:
         return list_
-
