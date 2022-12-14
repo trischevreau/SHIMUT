@@ -34,7 +34,7 @@ class IntersectionsPanel:
         ttk.Label(pframe, text=self.LM.get("intersections_to_find")).grid(row=0, column=0)
         self.check_buttons_SV = [BooleanVarPlus() for i in range(7)]
         self.check_buttons = [
-            ttk.Checkbutton(pframe, text=int_to_roman(i+1), command=self.__reapply,
+            ttk.Checkbutton(pframe, text=int_to_roman(i+1),
                             variable=self.check_buttons_SV[i]) for i in range(7)
         ]
         for i in range(len(self.check_buttons)):

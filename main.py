@@ -1,5 +1,6 @@
 import tkinter as tk
 from tkinter import filedialog as fd
+from tkinter import messagebox as msgbx
 import tkinter.ttk as ttk
 import pathlib
 
@@ -145,6 +146,9 @@ class Main:
         inter_menu.add_cascade(label=self.LM.get("text"), menu=lang_menu)
         self.menubar.add_cascade(label=self.LM.get("language"), menu=inter_menu)
 
+        # about menu
+        self.menubar.add_command(label=self.LM.get("about"), command=self.__about)
+
         """
         Last Commands
         """
@@ -215,6 +219,13 @@ class Main:
         """
         self.param_reader.save(self, "parameters/temp.shimut_state")
         self.__load_parameters("parameters/temp.shimut_state")
+
+    def __about(self):
+        """
+        Displays an "about window".
+        :return:
+        """
+        msgbx.showinfo(self.LM.get("about"), self.LM.get("about_text"))
 
     def __panic(self):
         """
