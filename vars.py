@@ -118,7 +118,6 @@ for scale_type in scales.keys():
 relatives = {}  # key : sorted scale, item : (Type, Note)
 for scale in universe:
     scale[2] = unoctaver(scale[2])
-    scale[2].sort()
     if tuple(scale[2]) not in list(relatives.keys()):
         relatives[tuple(scale[2])] = [(scale[0], scale[1])]
     else:

@@ -186,6 +186,7 @@ class Main:
             # else, keep it
             self.scale_chooser.set_menu(self.selected_scale_type_SV.get(),
                                         *[self.LM.get(e) for e in self.usable_scales])
+        self.apply()
 
     def __load(self):
         """

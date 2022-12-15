@@ -30,16 +30,23 @@ class IntersectionsPanel:
         jframe = ttk.Frame(root)
         pframe = ttk.LabelFrame(jframe, text=self.LM.get("parameters"))
         self.selected_number_to_find_SV = StringVarPlus(language_manager, "any")
-        ttk.Button(pframe, command=self.__reapply, text=self.LM.get("apply")).grid(row=2, column=0)
         ttk.Label(pframe, text=self.LM.get("intersections_to_find")).grid(row=0, column=0)
         self.check_buttons_SV = [BooleanVarPlus() for i in range(7)]
+        bframe = ttk.Frame(pframe)
         self.check_buttons = [
-            ttk.Checkbutton(pframe, text=int_to_roman(i+1),
+            ttk.Checkbutton(bframe, text=int_to_roman(i+1), command=self.__reapply,
                             variable=self.check_buttons_SV[i]) for i in range(7)
         ]
         for i in range(len(self.check_buttons)):
             self.check_buttons_SV[i].set(False)
             self.check_buttons[i].grid(column=1+i, row=0)
+        bframe.grid(row=0, column=1)
+        self.same_starting_note_SV = BooleanVarPlus()
+        ttk.Checkbutton(pframe, text=self.LM.get("same_starting_note"), command=self.__reapply,
+                        variable=self.same_starting_note_SV).grid(row=1, column=0)
+        self.same_scale_size_SV = BooleanVarPlus()
+        ttk.Checkbutton(pframe, text=self.LM.get("same_scale_size"), command=self.__reapply,
+                        variable=self.same_scale_size_SV).grid(row=1, column=1)
         pframe.pack()
         self.score = blocks.score.Score(jframe, self.LM, self.player, lw, lh, 7)
         self.selected_scale_SV = tk.Variable(value=[])
@@ -72,10 +79,14 @@ class IntersectionsPanel:
                 self.check_buttons[i].config(state=tk.DISABLED)
             else:
                 self.check_buttons[i].config(state=tk.NORMAL)
+        same_starting_note = self.same_starting_note_SV.get()
+        same_scale_size = self.same_scale_size_SV.get()
         for scale_ in universe:
             scale_[2] = [e % 12 for e in scale_[2]]
             if set.issubset(set(to_find), set(scale_[2])):
-                self.intersecting.append(scale_)
+                if (not same_scale_size) or (same_scale_size and len(scale_[2]) == len(flattenened_scale)):
+                    if (not same_starting_note) or (same_starting_note and scale_[2][0] == flattenened_scale[0]):
+                        self.intersecting.append(scale_)
         to_apply_set = [[] for i in range(7)]
         to_apply_colors = [[] for i in range(7)]
         for y in range(len(self.intersecting)):
@@ -105,9 +116,11 @@ class IntersectionsPanel:
 
     def set_state(self, states):
         self.score.set_state(states[0:3])
+        self.same_starting_note_SV.set(states[3])
+        self.same_scale_size_SV.set(states[4])
         for i in range(len(self.check_buttons)):
-            self.check_buttons_SV[i].set(states[3+i])
+            self.check_buttons_SV[i].set(states[5+i])
 
     def get_state(self):
-        return *self.score.get_state(),\
+        return *self.score.get_state(), self.same_starting_note_SV.get_state(), self.same_scale_size_SV.get_state() \
                *[self.check_buttons_SV[i].get_state() for i in range(len(self.check_buttons_SV))]
