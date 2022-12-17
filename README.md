@@ -1,3 +1,7 @@
+## Executable
+
+a compiled .exe made using py2exe is available in the folder "dist".
+
 ## About
 
 SHIMUT is a free tool to ease the use of musical theory.

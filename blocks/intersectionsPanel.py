@@ -122,5 +122,5 @@ class IntersectionsPanel:
             self.check_buttons_SV[i].set(states[5+i])
 
     def get_state(self):
-        return *self.score.get_state(), self.same_starting_note_SV.get_state(), self.same_scale_size_SV.get_state() \
+        return *self.score.get_state(), self.same_starting_note_SV.get_state(), self.same_scale_size_SV.get_state(), \
                *[self.check_buttons_SV[i].get_state() for i in range(len(self.check_buttons_SV))]

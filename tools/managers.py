@@ -19,7 +19,7 @@ class LanguageManager:
         """
         self.lang = lang
         self.note_notation = note_notation
-        self.bdd = sqlite3.connect("languages.db")
+        self.bdd = sqlite3.connect("data/languages.db")
         self.cur = self.bdd.cursor()
         self.texts = {}
 
