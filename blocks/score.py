@@ -138,8 +138,7 @@ class Score:
 
     def __play_full(self):
         """ Plays the full score """
-        for i in range(len(self.notes)):
-            self.__play_pos(i)
+        self.player.play_note([self.notes[pos] for pos in range(len(self.x_positions))])
 
     def do_initial(self):
         """
@@ -217,16 +216,16 @@ class Score:
 
     def apply(self, set_, colors="black"):
         """
-        Apply a set of notes to the score
+        Applies a set of notes to the score, erasing what was on it before
         :param set_: the set of notes can be seen as a list of chords or as a list of single notes (noted in heights)
         :param colors: the colors of the notes (or one color for them all)
         """
+        # fresh start
         assert len(set_) <= len(self.x_positions)
         if type(colors) == str:
             colors = [[colors for _ in range(len(set_[i]))] for i in range(len(set_))]
         self.notes = set_
         self.colors = colors
-        # fresh start
         self.do_initial()
         # transposition delta
         self.delta = all_notes_extended[self.LM.reverse_get_note(self.selected_translation_SV.get())]

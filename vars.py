@@ -5,38 +5,15 @@ Contains all the constants.
 from tools.utils import unoctaver
 
 english_notation = {
-    "Do": "C",
-    "Ré": "D",
-    "Mi": "E",
-    "Fa": "F",
-    "Sol": "G",
-    "La": "A",
-    "Si": "B",
+    "Do": "C", "Ré": "D", "Mi": "E", "Fa": "F", "Sol": "G", "La": "A", "Si": "B",
 }
 
 all_plain_notes = {
-    "C": 0,
-    "D": 2,
-    "E": 4,
-    "F": 5,
-    "G": 7,
-    "A": 9,
-    "B": 11,
+    "C": 0, "D": 2, "E": 4, "F": 5, "G": 7, "A": 9, "B": 11,
 }
 
 all_notes = {
-    "C": 0,
-    "C#": 1,
-    "D": 2,
-    "D#": 3,
-    "E": 4,
-    "F": 5,
-    "F#": 6,
-    "G": 7,
-    "G#": 8,
-    "A": 9,
-    "A#": 10,
-    "B": 11,
+    "C": 0, "C#": 1, "D": 2, "D#": 3, "E": 4, "F": 5, "F#": 6, "G": 7, "G#": 8, "A": 9, "A#": 10, "B": 11,
 }
 
 all_notes_extended = {}
@@ -127,6 +104,30 @@ try:
     del scale, temp, scale_type
 except NameError:
     pass
+
+colors_full = ['snow', 'ghost white', 'white smoke', 'gainsboro', 'floral white', 'old lace',
+               'linen', 'antique white', 'papaya whip', 'blanched almond', 'bisque', 'peach puff',
+               'navajo white', 'lemon chiffon', 'mint cream', 'azure', 'alice blue', 'lavender',
+               'lavender blush', 'misty rose', 'dark slate gray', 'dim gray', 'slate gray',
+               'light slate gray', 'gray', 'light gray', 'midnight blue', 'navy', 'cornflower blue', 'dark slate blue',
+               'slate blue', 'medium slate blue', 'light slate blue', 'medium blue', 'royal blue', 'blue',
+               'dodger blue', 'deep sky blue', 'sky blue', 'light sky blue', 'steel blue', 'light steel blue',
+               'light blue', 'powder blue', 'pale turquoise', 'dark turquoise', 'medium turquoise', 'turquoise',
+               'cyan', 'light cyan', 'cadet blue', 'medium aquamarine', 'aquamarine', 'dark green', 'dark olive green',
+               'dark sea green', 'sea green', 'medium sea green', 'light sea green', 'pale green', 'spring green',
+               'lawn green', 'medium spring green', 'green yellow', 'lime green', 'yellow green',
+               'forest green', 'olive drab', 'dark khaki', 'khaki', 'pale goldenrod', 'light goldenrod yellow',
+               'light yellow', 'yellow', 'gold', 'light goldenrod', 'goldenrod', 'dark goldenrod', 'rosy brown',
+               'indian red', 'saddle brown', 'sandy brown',
+               'dark salmon', 'salmon', 'light salmon', 'orange', 'dark orange',
+               'coral', 'light coral', 'tomato', 'orange red', 'red', 'hot pink', 'deep pink', 'pink', 'light pink',
+               'pale violet red', 'maroon', 'medium violet red', 'violet red',
+               'medium orchid', 'dark orchid', 'dark violet', 'blue violet', 'purple', 'medium purple',
+               'thistle']
+
+colors = ['snow', 'linen', 'azure', 'lavender blush', 'light slate gray', 'slate blue', 'dodger blue', 'light blue',
+          'cyan', 'dark sea green', 'lawn green', 'forest green', 'yellow', 'indian red', 'dark salmon', 'coral',
+          'pale violet red', 'medium orchid', 'thistle']
 
 GUITAR_LENGTH = 21
 

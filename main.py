@@ -5,7 +5,7 @@ import tkinter.ttk as ttk
 import pathlib
 
 from varplus import StringVarPlus, BooleanDictVarPlus
-from tools import managers
+from tools import managers, image
 import blocks
 from vars import *
 
@@ -136,12 +136,10 @@ class Main:
         inter_menu = tk.Menu(self.menubar, tearoff=0)
         lang_menu = tk.Menu(inter_menu, tearoff=0)
         for elem in self.LM.get_languages():
-            lang_menu.add_radiobutton(label=elem, variable=self.lang_SV, value=elem,
-                                      command=self.__reset_root)
+            lang_menu.add_radiobutton(label=elem, variable=self.lang_SV, value=elem, command=self.__reset_root)
         conv_menu = tk.Menu(inter_menu, tearoff=0)
         for elem in [("french", "Do Ré Mi Fa"), ("english", "C D E F")]:
-            conv_menu.add_radiobutton(label=elem[1], variable=self.conv_SV, value=elem[0],
-                                      command=self.__reset_root)
+            conv_menu.add_radiobutton(label=elem[1], variable=self.conv_SV, value=elem[0], command=self.__reset_root)
         inter_menu.add_cascade(label=self.LM.get("note_naming"), menu=conv_menu)
         inter_menu.add_cascade(label=self.LM.get("text"), menu=lang_menu)
         self.menubar.add_cascade(label=self.LM.get("language"), menu=inter_menu)
@@ -156,6 +154,7 @@ class Main:
         self.root.title("SHIMUT")
         self.root.wm_iconbitmap("assets/main_icon.ico")
         self.root.iconbitmap("assets/main_icon.ico")
+        self.root.iconphoto(True, image.load_image("main_icon.ico", 16, 16))
         self.root.pack_slaves()
 
     def __update_usable_scales(self):

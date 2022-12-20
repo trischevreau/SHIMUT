@@ -121,13 +121,16 @@ class Player:
         Plays the notes
         :param notes_list: the notes to play. Example : [[chordnote1,chordnote2],[othernote1],...]
         """
-        for notes in notes_list:
+        length = len(notes_list)
+        for notes_index in range(length):
+            notes = notes_list[notes_index]
             for n in notes:
                 self.midi_out.note_on(50+n, self.velocity)
             sleep(self.length)
             for n in notes:
                 self.midi_out.note_off(50+n, self.velocity)
-            sleep(self.length)
+            if notes_index+1!=length:
+                sleep(self.length)
 
     def quit(self):
         """ Destroys cleanly the class and midi instruments to avoid causing interferences. """

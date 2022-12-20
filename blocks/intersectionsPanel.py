@@ -1,10 +1,11 @@
 import tkinter as tk
 from tkinter import ttk as ttk
+from random import choice
 
 import blocks.score
-from tools.utils import int_to_roman
+from tools.utils import int_to_roman, euclidian_distance
 from varplus import StringVarPlus, BooleanVarPlus
-from vars import universe
+from vars import universe, colors
 
 
 class IntersectionsPanel:
@@ -23,6 +24,7 @@ class IntersectionsPanel:
         """
         self.LM = language_manager
         self.player = player
+        self.root = root
         self.scale = []
         self.note = None
         self.usable_scales = []
@@ -64,21 +66,26 @@ class IntersectionsPanel:
         """
         This applies the selected scale to display its intersections
         :param scale: the scale
+        :param note: the starting note of the scale
+        :param usable_scales: the set of scales to search for intersections in
         """
+        # init variables
         self.intersecting = []
         self.intersections_list.delete(0, 'end')
         self.scale = scale
         self.note = note
         self.usable_scales = usable_scales
-        colors = ["red", "blue", "green", "magenta", "cyan", "orange"]
         flattenened_scale = [e % 12 for e in scale]
-        to_find = [flattenened_scale[i] for i in range(7)
-                   if (self.check_buttons_SV[i].get() and i < len(flattenened_scale))]
+        # configure the check buttons
         for i in range(len(self.check_buttons)):
             if i >= len(flattenened_scale):
                 self.check_buttons[i].config(state=tk.DISABLED)
             else:
                 self.check_buttons[i].config(state=tk.NORMAL)
+        # notes to find
+        to_find = [flattenened_scale[i] for i in range(7)
+                   if (self.check_buttons_SV[i].get() and i < len(flattenened_scale))]
+        # search for the sets that are correctly 'intersecting'
         same_starting_note = self.same_starting_note_SV.get()
         same_scale_size = self.same_scale_size_SV.get()
         for scale_ in universe:
@@ -87,30 +94,46 @@ class IntersectionsPanel:
                 if (not same_scale_size) or (same_scale_size and len(scale_[2]) == len(flattenened_scale)):
                     if (not same_starting_note) or (same_starting_note and scale_[2][0] == flattenened_scale[0]):
                         self.intersecting.append(scale_)
-        to_apply_set = [[] for i in range(7)]
-        to_apply_colors = [[] for i in range(7)]
+        # get rid of the exact same scale
+        for y in range(len(self.intersecting)):
+            elem = self.intersecting[y]
+            if elem[2] == flattenened_scale and elem[1] == self.note:
+                self.intersecting.pop(y)
+                break
+        # display it
+        to_apply_set = [[] for _ in range(7)]
+        to_apply_colors = [[] for _ in range(7)]
+        used_colors = []
+        self.intersections_list.config(state=tk.NORMAL)
         for y in range(len(self.intersecting)):
             elem = self.intersecting[y]
             scores = []
-            d = 0
             l, l_ = len(elem[2]), len(flattenened_scale)
             for d in range(len(elem[2])):
-                scores.append((sum([elem[2][(d+i) % l] == flattenened_scale[i % l_] for i in range(len(elem[2]))]),
-                               d))
+                scores.append((sum([elem[2][(d+i) % l] == flattenened_scale[i % l_] for i in range(len(elem[2]))]), d))
             scores.sort(key=lambda z: z[0])
             d = scores[-1][1]
             if elem[0] in self.usable_scales:
+                cont = 0
+                color = "white"
+                while cont < len(colors):
+                    if sum([c // 256 for c in self.root.winfo_rgb(color)]) < 500 and color not in used_colors:
+                        used_colors.append(color)
+                        break
+                    else:
+                        cont += 1
+                        color = choice(colors)
                 for i in range(len(elem[2])):
                     to_apply_set[i].append(elem[2][(d + i) % len(elem[2])])
-                    to_apply_colors[i].append(colors[y % len(colors)])
+                    to_apply_colors[i].append(color)
                 self.intersections_list.insert(0, self.LM.get_note(elem[1]) + " - " + self.LM.get(elem[0]))
-                self.intersections_list.itemconfig(0, {'fg': colors[y % len(colors)]})
+                self.intersections_list.itemconfig(0, {'fg': color})
         for i in range(len(flattenened_scale)):
             to_apply_set[i].append(flattenened_scale[i])
             to_apply_colors[i].append("black")
         self.score.apply(to_apply_set, to_apply_colors)
 
-    def __reapply(self):
+    def __reapply(self, *_):
         """ Applies the scale, note and usable_scale once again. """
         self.apply(self.scale, self.note, self.usable_scales)
 

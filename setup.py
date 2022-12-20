@@ -23,6 +23,6 @@ setup(
     data_files=Mydata_files,
     script_args=['py2exe'],
     options={"py2exe": {"compressed": True}},
-    windows=["main.py"],
-    zipfile=None
+    windows= [{"script": "main.py", "icon_resources": [(0, "assets/main_icon.ico")]}],
+    zipfile=None,
 )

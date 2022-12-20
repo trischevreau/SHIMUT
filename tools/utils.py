@@ -2,6 +2,7 @@
 Contains all the useful functions.
 """
 
+from math import sqrt
 
 def int_to_roman(v):
     """
@@ -74,3 +75,14 @@ def unlistify(list_):
         return list_[0]
     else:
         return list_
+
+def euclidian_distance(v1,v2):
+    """
+    Calculates the euclidian distance between v1 and v2
+    :param v1: the first vector
+    :param v2: the second vector
+    :return: the euclidian distance between them
+    """
+    assert len(v1)==len(v2)
+    return sqrt(sum([(v1[i]-v2[i])^2 for i in range(len(v1))]))
+
