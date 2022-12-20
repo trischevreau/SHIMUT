@@ -1,6 +1,6 @@
 ## Executable
 
-a compiled .exe made using py2exe is available in the folder "dist".
+A compiled .exe (using py2exe) can be made using make_exe.sh on windows. It will appear in a folder named "dist".
 
 ## About
 
