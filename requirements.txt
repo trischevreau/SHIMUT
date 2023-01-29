@@ -1,0 +1,5 @@
+Pillow~=8.4.0
+pygame~=2.1.2
+future~=0.18.2
+pychord~=1.1.0
+py2exe~=0.13.0.0

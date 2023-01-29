@@ -30,7 +30,7 @@ circle = {
 }
 
 
-class scale_groups:
+class ScaleGroups:
     def __init__(self):
         self.CLASSIC = "classic"
         self.DIATONIC = "diatonic"
@@ -40,7 +40,7 @@ class scale_groups:
         self.FROM_HARM_MINOR = "from_harmonic_minor"
 
 
-sg = scale_groups()
+sg = ScaleGroups()
 
 
 scales = {

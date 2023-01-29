@@ -1,6 +1,6 @@
 import tkinter as tk
 from tkinter import filedialog as fd
-from tkinter import messagebox as msgbx
+from tkinter import messagebox as messagebox
 import tkinter.ttk as ttk
 import pathlib
 
@@ -130,6 +130,9 @@ class Main:
         for i in range(len(self.available_scale_names)):
             scales_menu.add_checkbutton(label=self.LM.get(self.available_scale_names[i]), onvalue=1, offvalue=0,
                                         variable=self.chosen_scales.list_[i], command=self.__update_usable_scales)
+        scales_menu.add_separator()
+        scales_menu.add_command(label=self.LM.get("all"), command=self.__select_all_scales)
+        scales_menu.add_command(label=self.LM.get("none"), command=self.__deselect_all_scales)
         self.menubar.add_cascade(label=self.LM.get("scales"), menu=scales_menu)
 
         # internationalization menu
@@ -225,7 +228,7 @@ class Main:
         Displays an "about window".
         :return:
         """
-        msgbx.showinfo(self.LM.get("about"), self.LM.get("about_text"))
+        messagebox.showinfo(self.LM.get("about"), self.LM.get("about_text"))
 
     def __panic(self):
         """
@@ -265,6 +268,24 @@ class Main:
             self.note_chooser.set_menu(self.usable_scale_notes[0], *self.usable_scale_notes)
         else:
             self.note_chooser.set_menu(self.selected_scale_note_SV.get(), *self.usable_scale_notes)
+
+    def __select_all_scales(self):
+        """
+        Selects all scales available on the menubar.
+        :return:
+        """
+        for btn in self.chosen_scales.list_:
+            btn.set_state(True)
+        self.__update_usable_scales()
+
+    def __deselect_all_scales(self):
+        """
+        Deselects all scales available on the menubar
+        :return:
+        """
+        for btn in self.chosen_scales.list_:
+            btn.set_state(False)
+        self.__update_usable_scales()
 
     def apply(self):
         """
