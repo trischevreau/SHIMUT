@@ -2,6 +2,9 @@ import tkinter as tk
 from functools import partial
 from tkinter import ttk as ttk
 
+from tools.managers import MIDIFileWriter
+from tools.converters import convert_height_to_midi
+
 from tools.image import load_image
 from varplus import StringVarPlus
 from vars import all_notes, all_notes_extended
@@ -82,6 +85,9 @@ class Score:
         translation_chooser.pack(side="top")
         self.selected_translation_SV.set(self.LM.get_note("C"))
 
+        # MIDI
+        ttk.Button(pframe, text=self.LM.get("save_to_midi_file"), command=self.dump_to_midi_file).pack()
+
         pframe.pack(side="left")
 
         """
@@ -114,6 +120,15 @@ class Score:
 
     def get_state(self):
         return self.selected_translation_SV.get_state(), self.octave_number, self.selected_alteration.get_state()
+
+    def dump_to_midi_file(self):
+        """
+        Dumps the chord progression to a MIDI file.
+        """
+        MIDIFileWriter_ = MIDIFileWriter(self.LM)
+        for chord in self.notes:
+            MIDIFileWriter_.add_notes(1, [convert_height_to_midi(e) for e in chord])
+        MIDIFileWriter_.write_file()
 
     def __increment_octave(self):
         """

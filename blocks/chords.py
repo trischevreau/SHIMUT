@@ -37,7 +37,7 @@ class Chords:
         self.deg_frame_checkboxes = [ttk.Checkbutton(self.deg_frame, text=int_to_roman(i+1), command=self.func_to_apply,
                                                      variable=self.deg_frame_checkboxes_SV[i]) for i in range(n)]
         for elem in self.deg_frame_checkboxes:
-            elem.pack(side="left")
+            elem.pack(side="left", fill=tk.BOTH)
         self.deg_frame.pack()
         self.frame.pack()
         self.chords_list = []

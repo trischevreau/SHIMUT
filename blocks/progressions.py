@@ -1,14 +1,11 @@
 import tkinter as tk
 import tkinter.ttk as ttk
-from tkinter import filedialog as fd
 
 from blocks.chords import Chords
 from varplus import StringVarPlus
 
 from vars import *
 from tools.utils import *
-from tools.managers import MIDIFileWriter
-from tools.converters import convert_height_to_midi
 
 
 class Progressions(Chords):
@@ -39,15 +36,6 @@ class Progressions(Chords):
                                                         "", command=self.__chord_changed))
             self.chords_selectors[-1].pack(side="left")
         pframe.pack()
-        ttk.Button(root, text=self.LM.get("save_to_midi_file"), command=self.dump_to_midi_file).pack()
-    def dump_to_midi_file(self):
-        """
-        Dumps the chord progression to a MIDI file.
-        """
-        MIDIFileWriter_ = MIDIFileWriter(self.LM)
-        for chord in self.chords_list:
-            MIDIFileWriter_.add_notes(1, [convert_height_to_midi(e) for e in chord])
-        MIDIFileWriter_.write_file()
 
     def __reapply(self):
         """
