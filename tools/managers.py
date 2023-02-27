@@ -238,5 +238,5 @@ class MIDIFileWriter:
                 defaultextension=".mid",
                 filetypes=[('MIDI file', '*.mid')])
         if path != "":
-            with open(path+".mid", 'wb') as outf:
+            with open(path, 'wb') as outf:
                 self.mf.writeFile(outf)
