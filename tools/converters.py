@@ -59,3 +59,13 @@ def convert_height_to_french(h):
     :return: "Do", "Ré#", "Fa"
     """
     return convert_english_to_french(convert_height_to_english(h))
+
+def convert_height_to_midi(h, starting=60):
+    """
+    Converts the height notation to a MIDI height.
+    :param h:  0, 3, 5 for example
+    :param starting: the starting note, C4 by default
+    :return: with default starting note (C4) : 60, 63, 65
+    """
+    return h+starting
+

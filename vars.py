@@ -75,6 +75,7 @@ scales = {
 }
 
 progressions = {
+    "scale": ["I", "II", "III", "IV", "V", "VI", "VII"],
     "perfect_cadence": ["V", "I"],
     "imperfect_cadence_V": ["V/", "I"],
     "imperfect_cadence_I": ["V", "I/"],

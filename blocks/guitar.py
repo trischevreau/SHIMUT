@@ -1,9 +1,3 @@
-"""
-This file contains classes named "displayers".
-They are elements meant to be used as elements of other classes if needed, but they can also be stand-alones.
-Anyway they use a master container to be displayed on a root.
-"""
-
 import tkinter as tk
 import tkinter.ttk as ttk
 
@@ -73,9 +67,9 @@ class Guitar:
                     else:
                         self.note_buttons[i][y - 1].config(bg=color, text=fill_spaces(str(deg), 3))
 
-    def __reapply(self, *arg):
+    def __reapply(self, *_):
         """ Used as a callback function when the transposition is changed to update the display
-        :param arg: completely ignored, the callback gives arguments that are not needed
+        :param _: completely ignored, the callback gives arguments that are not needed
         """
         self.apply(self.usable_notes)
 

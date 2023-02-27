@@ -7,4 +7,4 @@ guitar;E;B;G;D;A;E
 chords;C;0;#;1;0;1;0;1;0;0
 chords2;C;0;#;1;0;1;0;1;0;0
 intersections;C;0;#;0;0;1;1;1;1;1;1;1
-chordProg;C;0;#;1;0;1;0;1;0;0;V;I;0;0;0;0;0;perfect_cadence
+chordProg;C;0;#;1;0;1;0;1;0;0;I;II;III;IV;V;VI;VII;scale

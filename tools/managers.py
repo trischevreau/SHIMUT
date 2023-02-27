@@ -4,8 +4,10 @@ This contains the managing tools for the software.
 
 import sqlite3
 from tools import converters
+from tkinter import filedialog as fd
 import pygame.midi as midi
 from time import sleep
+from midiutil.MidiFile import MIDIFile
 
 
 class LanguageManager:
@@ -205,3 +207,36 @@ class StateReader:
                 else:
                     val = [str(v) for v in val]
                     file.write(key+";"+";".join(val)+"\n")
+
+class MIDIFileWriter:
+
+    """ This class manages MIDI files. """
+
+    def __init__(self, LM):
+        self.mf = MIDIFile(1)  # only 1 track
+        self.track = 0  # the only track
+        self.time = 0
+        self.mf.addTrackName(self.track, self.time, "Track")
+        self.mf.addTempo(self.track, self.time, 120)
+        self.channel = 0
+        self.volume = 100
+        self.LM = LM
+
+    def add_notes(self, length, pitch_list):
+        for pitch in pitch_list:
+            self.mf.addNote(self.track, self.channel, pitch, self.time, length, self.volume)
+        self.time += length
+
+    def add_note(self, length, pitch):
+        self.mf.addNote(self.track, self.channel, pitch, self.time, length, self.volume)
+        self.time += length
+
+    def write_file(self, path=None):
+        if path is None:
+            path = fd.asksaveasfilename(
+                title=self.LM.get("save"),
+                defaultextension=".mid",
+                filetypes=[('MIDI file', '*.mid')])
+        if path != "":
+            with open(path+".mid", 'wb') as outf:
+                self.mf.writeFile(outf)
