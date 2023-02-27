@@ -80,14 +80,14 @@ class Main:
         instruments_display_frame.pack()
         self.main_notebook.add(instruments_display_frame, text=self.LM.get("instruments"))
 
-        # Accords
-        chords_frame = ttk.Frame(self.main_notebook)
-        self.chords = blocks.chords.Chords(chords_frame, self.LM, self.player, SCORE_WIDTH, SCORE_HEIGHT, 7)
-        self.chords2 = blocks.chords.Chords(chords_frame, self.LM, self.player, SCORE_WIDTH, SCORE_HEIGHT, 7)
-        chords_frame.pack()
-        self.main_notebook.add(chords_frame, text=self.LM.get("chords"))
+        # Transposition
+        transposition_frame = ttk.Frame(self.main_notebook)
+        self.chords = blocks.chords.Chords(transposition_frame, self.LM, self.player, SCORE_WIDTH, SCORE_HEIGHT, 7)
+        self.chords2 = blocks.chords.Chords(transposition_frame, self.LM, self.player, SCORE_WIDTH, SCORE_HEIGHT, 7)
+        transposition_frame.pack()
+        self.main_notebook.add(transposition_frame, text=self.LM.get("transpose"))
 
-        # Scale Intersections
+        # Scale
         scale_inter_frame = ttk.Frame(self.main_notebook)
         self.intersections = blocks.intersectionsPanel.IntersectionsPanel(scale_inter_frame, self.LM, self.player,
                                                                           SCORE_WIDTH, SCORE_HEIGHT)
