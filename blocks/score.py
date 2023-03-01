@@ -127,7 +127,7 @@ class Score:
         """
         MIDIFileWriter_ = MIDIFileWriter(self.LM)
         for chord in self.notes:
-            MIDIFileWriter_.add_notes(1, [convert_height_to_midi(e) for e in chord])
+            MIDIFileWriter_.add_notes(1, [convert_height_to_midi(e - self.delta) for e in chord])
         MIDIFileWriter_.write_file()
 
     def __increment_octave(self):
