@@ -103,9 +103,9 @@ class Score:
         """
 
         npframe = ttk.LabelFrame(rframe, text=self.LM.get("play"))
-        ttk.Button(npframe, text=self.LM.get("all"), command=self.__play_full).pack(side="left")
+        ttk.Button(npframe, text=self.LM.get("all"), command=self.play_full).pack(side="left")
         for i in range(n):
-            func = partial(self.__play_pos, i)
+            func = partial(self.play_pos, i)
             ttk.Button(npframe, text=str(i+1), command=func).pack(side="left")
         npframe.pack(side="bottom")
         rframe.pack(side="right")
@@ -144,14 +144,14 @@ class Score:
         self.octave_number -= 1
         self.__reapply()
 
-    def __play_pos(self, pos):
+    def play_pos(self, pos):
         """
         Plays the notes at a given position
         :param pos: the position on the score of the notes to play
         """
         self.player.play_note([self.notes[pos]])
 
-    def __play_full(self):
+    def play_full(self):
         """ Plays the full score """
         self.player.play_note([self.notes[pos] for pos in range(len(self.x_positions))])
 

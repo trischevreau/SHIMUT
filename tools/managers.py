@@ -5,6 +5,7 @@ This contains the managing tools for the software.
 import sqlite3
 from tools import converters
 from tkinter import filedialog as fd
+from tkinter.messagebox import showinfo
 import pygame.midi as midi
 from time import sleep
 from midiutil.MidiFile import MIDIFile
@@ -240,3 +241,25 @@ class MIDIFileWriter:
         if path != "":
             with open(path, 'wb') as outf:
                 self.mf.writeFile(outf)
+
+
+def give_help(subject, LM):
+
+    # initialize the help database
+    lang = LM.lang
+    bdd = sqlite3.connect("data/help.db")
+    cur = bdd.cursor()
+
+    # try getting the selected langage from the database
+    r = cur.execute("SELECT " + lang + " FROM texts WHERE subject == '" + subject + "'").fetchone()
+    if r is not None:
+        text = r[0]
+    else:  # if there was no entry for this langage
+        print("Warn : Missing text_name entry <", subject, "> for langage <", lang, ">")
+        return None
+
+    # display the text
+    showinfo(LM.get("help"), text)
+
+    # end routine
+    cur.close()

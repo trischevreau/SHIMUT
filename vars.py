@@ -85,6 +85,10 @@ progressions = {
     "deceptive_cadence": ["V", "VI"]
 }
 
+chord_functions = {"dominant":["V", "VII"], "sub-dominant":["II", "IV", "VI"], "tonic":["I", "III"]}
+function_color = {"dominant":"red", "sub-dominant":"yellow", "tonic":"green", "?":"pink"}
+function_abbreviation = {"dominant":" D ", "sub-dominant":"S-D", "tonic":" T "}
+
 universe = []  # item : (Type, Note, Scale)
 for scale_type in scales.keys():
     for note in scales[scale_type][1]:

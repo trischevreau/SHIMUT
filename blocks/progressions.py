@@ -1,12 +1,14 @@
 import tkinter as tk
 import tkinter.ttk as ttk
+from functools import partial
 
 from blocks.chords import Chords
 from varplus import StringVarPlus
 
 from vars import *
 from tools.utils import *
-
+from tools.image import load_image
+from tools.managers import give_help
 
 class Progressions(Chords):
 
@@ -27,14 +29,24 @@ class Progressions(Chords):
                                              self.LM.get("personalized"),
                                              *[self.LM.get(v) for v in progressions.keys()],
                                              command=self.__prog_changed)
-        progression_chooser.pack(side="left", expand=True, fill=tk.BOTH)
+        progression_chooser.grid(column=0, row=0)
         self.selected_chords_SV = []
         self.chords_selectors = []
         for i in range(n):
             self.selected_chords_SV.append(StringVarPlus(self.LM, "any"))
             self.chords_selectors.append(ttk.OptionMenu(pframe, self.selected_chords_SV[-1], int_to_roman(i + 1),
                                                         "", command=self.__chord_changed))
-            self.chords_selectors[-1].pack(side="left")
+            self.chords_selectors[-1].grid(column=i + 1, row=0, padx=10, pady=10)
+        ttk.Label(pframe, text=self.LM.get("classical_function")).grid(column=0, row=1)
+        self.functions_colored_indicator = []
+        for i in range(n):
+            partial_func = partial(self.score.play_pos, i)
+            self.functions_colored_indicator.append(tk.Button(pframe, text="   ", font="TkFixedFont", fg="black",
+                                                              command=partial_func))
+            self.functions_colored_indicator[-1].grid(column=i + 1, row=1, padx=10, pady=10)
+        self.help_image = load_image("help.png", 15, 15)
+        help_command = partial(give_help, "chord_functions", self.LM)
+        ttk.Button(pframe, text="help", image=self.help_image, command=help_command).grid(column= n + 1, row=1)
         pframe.pack()
 
     def __reapply(self):
@@ -51,9 +63,18 @@ class Progressions(Chords):
             if "/" in self.selected_chords_SV[i].get():
                 val += "/"
             self.chords_selectors[i].set_menu(val, *chords)
+        for i in range(0, len(self.functions_colored_indicator)):
+            self.functions_colored_indicator[i].config(text="   ", bg="white")
         for i in range(len(self.selected_chords_SV)):
             current = self.selected_chords_SV[i].get()
             if current != "0":
+                for function, degrees in chord_functions.items():
+                    if current in degrees:
+                        self.functions_colored_indicator[i].config(bg=function_color[function],
+                                                                   text=function_abbreviation[function])
+                        break
+                else:
+                    self.functions_colored_indicator[i].config(bg=function_color["?"], text=" ? ")
                 inverted = False
                 chord = []
                 oct_sup = 0

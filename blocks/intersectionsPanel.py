@@ -117,7 +117,7 @@ class IntersectionsPanel:
                 cont = 0
                 color = "white"
                 while cont < len(colors):
-                    if sum([c // 256 for c in self.root.winfo_rgb(color)]) < 500 and color not in used_colors:
+                    if sum([c for c in self.root.winfo_rgb(color)]) < 2 * 65535 and color not in used_colors:
                         used_colors.append(color)
                         break
                     else:
