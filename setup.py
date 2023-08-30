@@ -1,28 +1,27 @@
-"""
-This is the script to build an executable .exe file on windows.
-"""
+import sys
+from cx_Freeze import setup, Executable
 
-from distutils.core import setup
-import py2exe
-import os
+script = 'main.py'
 
-print("[!] Building the executable file")
+includefiles = ['README.md', 'LICENSE.md', 'assets/', 'data/', 'parameters/']
+includes = []
+excludes = []
+packages = ['PIL', 'pygame', 'tkinter', 'pychord', 'midiutil', 'sqlite3']
 
-dirs_to_do = ["assets", "parameters", "data"]
-Mydata_files = []
-for dir in dirs_to_do:
-    path_ = os.getcwd() + "\\" + dir + "\\"
-    files = [path_+e for e in os.listdir(path_) if os.path.isfile(path_+e)]
-    Mydata_files.append((dir, files))
-
-print("[!] Files to include :")
-for line in Mydata_files:
-    print("[!] >", line)
+base = None
+if sys.platform == "win32":
+    base = "Win32GUI"    # Tells the build script to hide the console.
 
 setup(
-    data_files=Mydata_files,
-    script_args=['py2exe'],
-    options={"py2exe": {"compressed": True}},
-    windows= [{"script": "main.py", "icon_resources": [(0, "assets/main_icon.ico")]}],
-    zipfile=None,
+    name='SHIMUT',
+    description='Software to Help Illiterate Musicians Use (musical) Theory',
+    executables=[Executable(script, base=base)],
+    options={
+        'build_exe': {
+            'includes':includes,
+            'excludes':excludes,
+            'include_files':includefiles,
+            'packages': packages,
+        },
+    },
 )

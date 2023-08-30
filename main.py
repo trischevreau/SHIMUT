@@ -114,7 +114,7 @@ class Main:
         """
 
         # init
-        self.root.config(menu=self.menubar)
+        self.root.config(menu=self.menubar, padx=10, pady=10)
 
         # file
         file_menu = tk.Menu(self.menubar, tearoff=0)
