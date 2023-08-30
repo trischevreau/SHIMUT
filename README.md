@@ -1,6 +1,6 @@
 ## Executable
 
-A compiled .exe (using py2exe) can be made using make_exe.sh on windows. It will appear in a folder named "dist".
+A compiled .exe (using cx Freeze) can be made using make_exe.bat on windows. It will appear in a folder named "dist".
 
 ## About
 
