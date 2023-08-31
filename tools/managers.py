@@ -5,7 +5,7 @@ This contains the managing tools for the software.
 import sqlite3
 from tools import converters
 from tkinter import filedialog as fd
-from tkinter.messagebox import showinfo
+from tkinter.messagebox import showinfo, showerror
 import pygame.midi as midi
 from time import sleep
 from midiutil.MidiFile import MIDIFile
@@ -156,14 +156,19 @@ class StateReader:
         """
         self.file_path = file_path
         self.dict_ = {}
-        with open(self.file_path, "r") as file:
-            for line in file.readlines():
-                line = line.rstrip().split(";")
-                if len(line[1:]) == 1:
-                    self.dict_[line[0]] = line[1:][0]
-                else:
-                    self.dict_[line[0]] = line[1:]
-        return self.dict_
+        try:
+            with open(self.file_path, "r") as file:
+                for line in file.readlines():
+                    line = line.rstrip().split(";")
+                    if len(line[1:]) == 1:
+                        self.dict_[line[0]] = line[1:][0]
+                    else:
+                        self.dict_[line[0]] = line[1:]
+        except FileNotFoundError:
+            showerror("Error", "The default SHIMUT state was not found in parameters/default.shimut_state")
+            quit()
+        else:
+            return self.dict_
 
     def get(self, name):
         """
