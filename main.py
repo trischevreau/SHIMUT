@@ -20,6 +20,7 @@ class Main:
         """
 
         self.root = tk.Tk()
+        self.root.protocol('WM_DELETE_WINDOW', self.__ask_quit)
 
         # Classes init 1
         self.param_reader = managers.StateReader()
@@ -122,7 +123,7 @@ class Main:
         file_menu.add_command(label=self.LM.get("save"), command=self.__save)
         file_menu.add_separator()
         file_menu.add_command(label=self.LM.get("panic"), command=self.__panic)
-        file_menu.add_command(label=self.LM.get("exit"), command=self.quit)
+        file_menu.add_command(label=self.LM.get("exit"), command=self.__ask_quit)
         self.menubar.add_cascade(label=self.LM.get("file"), menu=file_menu)
 
         # scales
@@ -244,7 +245,6 @@ class Main:
         :return:
         """
         self.quit()
-        self.root.destroy()
         self.__init__(file)
         self.mainloop()
 
@@ -303,12 +303,21 @@ class Main:
         self.intersections.apply(scale_to_apply, self.selected_scale_note_SV.get_state(), self.usable_scales)
         self.scale = scale_to_apply
 
+    def __ask_quit(self):
+        """
+        Asks if the user wants to quit, and then applies the answer.
+        :return:
+        """
+        r = messagebox.askyesno(self.LM.get("quit?"), self.LM.get("do_you_really_want_to_quit?"))
+        if r is True:
+            self.quit()
+
     def quit(self):
         """
         Exits the program cleanly.
         :return:
         """
-        self.root.quit()
+        self.root.destroy()
         self.player.quit()
         self.LM.quit()
 
@@ -320,4 +329,3 @@ Main loop
 if __name__ == "__main__":
     main = Main()
     main.mainloop()
-    main.quit()
