@@ -5,7 +5,7 @@ A compiled .exe (using cx Freeze) can be made using make_exe.bat on windows. It 
 ## About
 
 SHIMUT is a free tool to ease the use of musical theory.
-It was coded on my free time and I am not a professional.
+It was coded on my free time, and I am not a professional.
 Feel free to give me feedback and ideas, or to contribute to the project !
 If you want, you can also donate on paypal.me/TristanChevreau
 
