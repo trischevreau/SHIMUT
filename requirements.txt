@@ -1,0 +1,5 @@
+Pillow~=9.3.0
+pygame~=2.2.0
+future~=0.18.3
+MIDIUtil~=1.2.1
+pychord~=1.1.1
