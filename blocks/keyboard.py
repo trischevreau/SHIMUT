@@ -1,7 +1,7 @@
 import tkinter as tk
 from tkinter import ttk as ttk
 
-from tools.utils import unoctaver, fill_spaces, int_to_roman
+from tools.utils import un_octaver, fill_spaces, int_to_roman
 
 
 class Keyboard:
@@ -37,7 +37,7 @@ class Keyboard:
         Applies a scale to the keyboard.
         :param usable_notes: the notes to put on it
         """
-        usable_notes = unoctaver(usable_notes)
+        usable_notes = un_octaver(usable_notes)
         self.initial_color()
         for i in range(24):
             if i % 12 in usable_notes:

@@ -27,11 +27,11 @@ class Guitar:
                                                      *self.LM.get_notes(all_notes.keys()), command=self.__reapply))
             self.notes_choosers[-1].grid(column=0, row=i)
             ttk.Label(self.frame, text="-").grid(column=1, row=i)
-            temp = []
+            temp_buttons_list = []
             for y in range(GUITAR_LENGTH - 1):
-                temp.append(tk.Button(self.frame, font="TkFixedFont", state=tk.DISABLED))
-                temp[-1].grid(column=1 + y, row=i)
-            self.note_buttons.append(temp)
+                temp_buttons_list.append(tk.Button(self.frame, font="TkFixedFont", state=tk.DISABLED))
+                temp_buttons_list[-1].grid(column=1 + y, row=i)
+            self.note_buttons.append(temp_buttons_list)
         for e in GUITAR_DOTS:
             if e[0] <= GUITAR_LENGTH:
                 tk.Label(self.frame, text=e[1], font=("TkFixedFont", 16)).grid(column=e[0], row=7)
@@ -51,7 +51,7 @@ class Guitar:
         Applies a scale to the guitar
         :param scale_to_apply: the notes to put on it
         """
-        self.usable_notes = unoctaver(scale_to_apply)
+        self.usable_notes = un_octaver(scale_to_apply)
         self.initial_color()
         for i in range(len(self.note_buttons)):
             for y in range(len(self.note_buttons[i]) + 1):

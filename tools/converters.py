@@ -32,8 +32,7 @@ def convert_english_to_french(note):
         for i in range(len(note)):
             if note[i] == v:
                 replace_list.append((i, k))
-    delta = 0
-    replace_list.sort(key=lambda v: v[0])
+    replace_list.sort(key=lambda v_: v_[0])
     replace_list.reverse()
     for item in replace_list:
         note = note[0:item[0]] + item[1] + note[item[0]+1:]

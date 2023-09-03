@@ -121,8 +121,8 @@ class Player:
 
     def play_note(self, notes_list):
         """
-        Plays the notes
-        :param notes_list: the notes to play. Example : [[chordnote1,chordnote2],[othernote1],...]
+        Plays the notes from notes_list.
+        :param notes_list: the notes to play. Example : [[chord_note1,chord_note2],[other_note1],...]
         """
         length = len(notes_list)
         for notes_index in range(length):
@@ -138,6 +138,7 @@ class Player:
     def quit(self):
         """ Destroys cleanly the class and midi instruments to avoid causing interferences. """
         midi.quit()
+        self.midi_out = None
 
 
 class StateReader:
@@ -244,8 +245,8 @@ class MIDIFileWriter:
                 defaultextension=".mid",
                 filetypes=[('MIDI file', '*.mid')])
         if path != "":
-            with open(path, 'wb') as outf:
-                self.mf.writeFile(outf)
+            with open(path, 'wb') as out_file:
+                self.mf.writeFile(out_file)
 
 
 def give_help(subject, LM):

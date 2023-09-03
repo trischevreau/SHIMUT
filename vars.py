@@ -2,7 +2,7 @@
 Contains all the constants.
 """
 
-from tools.utils import unoctaver
+from tools.utils import un_octaver
 
 english_notation = {
     "Do": "C", "Ré": "D", "Mi": "E", "Fa": "F", "Sol": "G", "La": "A", "Si": "B",
@@ -85,7 +85,7 @@ progressions = {
     "deceptive_cadence": ["V", "VI"]
 }
 
-chord_functions = {"dominant":["V", "VII"], "sub-dominant":["II", "IV", "VI"], "tonic":["I", "III"]}
+chord_functions = {"dominant":["V", "VII"], "sub-dominant":["II", "IV",], "tonic":["I", "III", "VI"]}
 function_color = {"dominant":"red", "sub-dominant":"yellow", "tonic":"green", "?":"pink"}
 function_abbreviation = {"dominant":" D ", "sub-dominant":"S-D", "tonic":" T "}
 
@@ -99,7 +99,7 @@ for scale_type in scales.keys():
 
 relatives = {}  # key : sorted scale, item : (Type, Note)
 for scale in universe:
-    scale[2] = unoctaver(scale[2])
+    scale[2] = un_octaver(scale[2])
     if tuple(scale[2]) not in list(relatives.keys()):
         relatives[tuple(scale[2])] = [(scale[0], scale[1])]
     else:

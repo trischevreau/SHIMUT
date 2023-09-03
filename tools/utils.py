@@ -52,11 +52,11 @@ def fill_spaces(s, length):
     return s+" "*(length-len(s))
 
 
-def unoctaver(to_scale):
+def un_octaver(to_scale):
     """
     Makes every note in between 0 and 11.
-    :param to_scale: the scale to "unoctave"
-    :return: the "unoctaved" scale
+    :param to_scale: the scale to "un-octave"
+    :return: the "un-octaved" scale
     """
     to_scale = list(to_scale)
     for i in range(len(to_scale)):

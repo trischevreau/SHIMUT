@@ -3,7 +3,7 @@ from cx_Freeze import setup, Executable
 
 script = 'main.py'
 
-includefiles = ['README.md', 'LICENSE.md', 'assets/', 'data/', 'parameters/']
+include_files = ['README.md', 'LICENSE.md', 'assets/', 'data/', 'parameters/']
 includes = []
 excludes = []
 packages = ['PIL', 'pygame', 'tkinter', 'pychord', 'midiutil', 'sqlite3']
@@ -20,7 +20,7 @@ setup(
         'build_exe': {
             'includes':includes,
             'excludes':excludes,
-            'include_files':includefiles,
+            'include_files':include_files,
             'packages': packages,
         },
     },

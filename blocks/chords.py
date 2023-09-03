@@ -49,7 +49,6 @@ class Chords:
         Builds the chords list from the scale of the class
         """
         self.chords_list = []
-        oct_sup = 0
         for starting_note in range(len(self.scale)):
             chord = []
             oct_sup = 0
@@ -70,7 +69,7 @@ class Chords:
         delta = self.score.get_delta()
         for i in range(len(self.chords_list)):
             # search which chord it is to display it. Sometimes chords have multiple names, hence the [0] index
-            if self.chords_list[i] != []:
+            if self.chords_list[i]:
                 try:
                     self.score.add_annotation(i, self.LM.get_note(str(pychord.find_chords_from_notes(
                         [converters.convert_height_to_english(h - delta) for h in self.chords_list[i]])[0])))

@@ -35,7 +35,7 @@ class Score:
         self.display_warning = False
 
         (self.width, self.height) = (lx, ly)
-        self.annotations = ["" for i in range(n)]
+        self.annotations = ["" for _ in range(n)]
         self.padding = 0.1
         self.line_delta = self.height * (1 - self.padding * 2) / 10
         self.x_positions = [self.padding * self.width * 3
@@ -70,12 +70,12 @@ class Score:
         self.selected_alteration.set("#")
 
         # octaves
-        oframe = ttk.LabelFrame(pframe, text=self.LM.get("octaves"))
-        ttk.Button(oframe, text="+", width=3, command=self.__increment_octave).pack(side="right")
-        ttk.Button(oframe, text="-", width=3, command=self.__decrement_octave).pack(side="left")
-        self.octave_label = ttk.Label(oframe, text="0")
+        o_frame = ttk.LabelFrame(pframe, text=self.LM.get("octaves"))
+        ttk.Button(o_frame, text="+", width=3, command=self.__increment_octave).pack(side="right")
+        ttk.Button(o_frame, text="-", width=3, command=self.__decrement_octave).pack(side="left")
+        self.octave_label = ttk.Label(o_frame, text="0")
         self.octave_label.pack(side="left")
-        oframe.pack(side="top")
+        o_frame.pack(side="top")
 
         # translation
         self.selected_translation_SV = StringVarPlus(self.LM, "note")
@@ -102,12 +102,12 @@ class Score:
         Playback
         """
 
-        npframe = ttk.LabelFrame(rframe, text=self.LM.get("play"))
-        ttk.Button(npframe, text=self.LM.get("all"), command=self.play_full).pack(side="left")
+        np_frame = ttk.LabelFrame(rframe, text=self.LM.get("play"))
+        ttk.Button(np_frame, text=self.LM.get("all"), command=self.play_full).pack(side="left")
         for i in range(n):
             func = partial(self.play_pos, i)
-            ttk.Button(npframe, text=str(i+1), command=func).pack(side="left")
-        npframe.pack(side="bottom")
+            ttk.Button(np_frame, text=str(i+1), command=func).pack(side="left")
+        np_frame.pack(side="bottom")
         rframe.pack(side="right")
 
         self.frame.pack(side="top")
@@ -125,10 +125,10 @@ class Score:
         """
         Dumps the chord progression to a MIDI file.
         """
-        MIDIFileWriter_ = MIDIFileWriter(self.LM)
+        midi_file_writer_ = MIDIFileWriter(self.LM)
         for chord in self.notes:
-            MIDIFileWriter_.add_notes(1, [convert_height_to_midi(e - self.delta) for e in chord])
-        MIDIFileWriter_.write_file()
+            midi_file_writer_.add_notes(1, [convert_height_to_midi(e - self.delta) for e in chord])
+        midi_file_writer_.write_file()
 
     def __increment_octave(self):
         """
@@ -164,7 +164,7 @@ class Score:
         self.canvas.delete("all")
         self.canvas.create_image(self.padding * self.width * 1.5, self.height // 2,
                                  anchor=tk.CENTER, image=self.images["sol_clef"])
-        self.annotations = ["" for i in range(len(self.x_positions))]
+        self.annotations = ["" for _ in range(len(self.x_positions))]
         for i in range(5):
             self.canvas.create_line(self.width * self.padding, self.height / 2 - (1.5 - i) * self.line_delta,
                                     self.width * (1 - self.padding), self.height / 2 - (1.5 - i) * self.line_delta,
@@ -198,6 +198,7 @@ class Score:
         Displays a note on the score
         :param n: the height of the note
         :param xp: it's horizontal position (index) on the score
+        :param color: the color of the note to display
         """
         (h, alt) = self.convert_height(n)
         # prints the note on the canvas
@@ -216,7 +217,7 @@ class Score:
             self.canvas.create_text(self.x_positions[xp] - 1.2 * self.line_delta,
                                     self.height / 2 - self.line_delta * h / 2, fill=color,
                                     text=alt, font=("TkFixedFont", int(self.line_delta)))
-        # prints additionnal lines if needed
+        # prints additional lines if needed
         while h <= -6 or h >= 5:
             if abs(h) % 2 == 1:
                 self.canvas.create_line(self.x_positions[xp] - self.line_delta,
@@ -283,9 +284,9 @@ class Score:
         self.canvas.create_text(self.x_positions[pos], self.line_delta * (pos % 2 + 1),
                                 text=annotation, font=("TkFixedFont", int(self.line_delta*0.8)))
 
-    def __reapply(self, *args):
+    def __reapply(self, *_):
         """ Used as a callback function when the transposition is changed to update the score and the classes using it
-        :param args: completely ignored, the callback gives arguments that are not needed
+        :param _: completely ignored, the callback gives arguments that are not needed
         """
         self.apply(self.notes, self.colors)
         self.func_to_apply()

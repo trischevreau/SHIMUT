@@ -3,16 +3,16 @@ from tkinter import StringVar, BooleanVar
 
 class StringVarPlus(StringVar):
 
-    def __init__(self, LM, type):
+    def __init__(self, LM, type_):
         self.LM = LM
         super().__init__()
-        if type == "note":
+        if type_ == "note":
             self.gfunc = self.LM.reverse_get_note
             self.sfunc = self.LM.get_note
-        elif type == "text_db":
+        elif type_ == "text_db":
             self.gfunc = self.LM.reverse_get
             self.sfunc = self.LM.get
-        elif type == "any":
+        elif type_ == "any":
             self.gfunc = str
             self.sfunc = str
         else:
@@ -41,7 +41,7 @@ class BooleanDictVarPlus:
 
     def __init__(self, n):
         self.n = n
-        self.list_ = [BooleanVarPlus() for e in range(n)]
+        self.list_ = [BooleanVarPlus() for _ in range(n)]
 
     def __len__(self):
         return self.n
