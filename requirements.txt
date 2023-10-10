@@ -1,4 +1,4 @@
-Pillow==10.0.0
+pillow>=10.0.1
 pygame==2.5.1
 future~=0.18.3
 MIDIUtil~=1.2.1
