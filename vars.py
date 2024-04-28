@@ -135,6 +135,7 @@ colors = ['snow', 'linen', 'azure', 'lavender blush', 'light slate gray', 'slate
           'pale violet red', 'medium orchid', 'thistle']
 
 GUITAR_LENGTH = 21
+GUITAR_CORDS = 6
 
 GUITAR_DOTS = [(3, "*"), (5, "*"), (7, "*"), (9, "*"), (12, "**"), (15, "*"), (17, "*"), (19, "*")]
 

@@ -21,7 +21,7 @@ class Guitar:
         self.selected_notes_SV = []
         self.notes_choosers = []
         self.usable_notes = []
-        for i in range(6):
+        for i in range(GUITAR_CORDS):
             self.selected_notes_SV.append(StringVarPlus(self.LM, "note"))
             self.notes_choosers.append(tk.OptionMenu(self.frame, self.selected_notes_SV[-1],
                                                      *self.LM.get_notes(all_notes.keys()), command=self.__reapply))
